@@ -11,19 +11,19 @@ func CompressHandler(w http.ResponseWriter, r *http.Request) {
 	if r.Method == http.MethodPost {
 		url := r.FormValue("url")
 
-		if len(url) != 0 {
-			m := app.SaveUrls()
-
-			for k, v := range m {
-				if url == k {
-					w.Write([]byte("http://localhost:8080/" + v))
-					w.WriteHeader(http.StatusCreated)
-				}
-			}
+		if len(url) == 0 {
+			w.WriteHeader(http.StatusBadRequest)
+			return
 		}
 
-		w.WriteHeader(http.StatusBadRequest)
-		return
+		m := app.SaveUrls()
+
+		for k, v := range m {
+			if url == k {
+				w.Write([]byte("http://localhost:8080/" + v))
+				w.WriteHeader(http.StatusCreated)
+			}
+		}
 	}
 
 	if r.Method == http.MethodGet {
@@ -40,5 +40,4 @@ func CompressHandler(w http.ResponseWriter, r *http.Request) {
 	}
 
 	w.WriteHeader(http.StatusBadRequest)
-	return
 }
