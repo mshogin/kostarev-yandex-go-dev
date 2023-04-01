@@ -2,16 +2,16 @@ package app
 
 var M = map[string]string{}
 
-func SaveUrls(url, miniUrl string) {
-	miniUrl = "/" + miniUrl
-	M[miniUrl] = url
+func SaveUrls(url, miniURL string) {
+	miniURL = "/" + miniURL
+	M[miniURL] = url
 }
 
-func GetUrl(miniUlr string) string {
-	if miniUlr != "" {
-		_, ok := M[miniUlr]
+func GetURL(miniURL string) string {
+	if miniURL != "" {
+		_, ok := M[miniURL]
 		if ok {
-			return M[miniUlr]
+			return M[miniURL]
 		}
 	}
 

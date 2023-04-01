@@ -16,17 +16,17 @@ func CompressHandler(w http.ResponseWriter, r *http.Request) {
 			return
 		}
 
-		miniUrl := app.RandomUrl()
-		app.SaveUrls(url, miniUrl)
+		miniURL := app.RandomURL()
+		app.SaveUrls(url, miniURL)
 
-		w.Write([]byte("http://localhost:8080/" + miniUrl))
+		w.Write([]byte("http://localhost:8080/" + miniURL))
 		w.WriteHeader(http.StatusCreated)
 	}
 
 	if r.Method == http.MethodGet {
 		url := r.URL.String()
 
-		m := app.GetUrl(url)
+		m := app.GetURL(url)
 		if m == "" {
 			w.WriteHeader(http.StatusBadRequest)
 			return
@@ -34,7 +34,6 @@ func CompressHandler(w http.ResponseWriter, r *http.Request) {
 
 		w.Header().Add("Location", m)
 		w.WriteHeader(http.StatusTemporaryRedirect)
-
 	}
 
 	w.WriteHeader(http.StatusBadRequest)

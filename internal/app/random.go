@@ -2,7 +2,7 @@ package app
 
 import "math/rand"
 
-func RandomUrl() string {
+func RandomURL() string {
 	alphabet := []rune("ABCDEFGHIJKLMNOPQRSTUVWXYZabcdefghijklmnopqrstuvwxyz")
 
 	b := make([]rune, 8)
