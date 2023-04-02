@@ -17,7 +17,7 @@ func methodPost(w http.ResponseWriter, r *http.Request) {
 	app.SaveUrls(string(body), miniURL)
 
 	w.WriteHeader(http.StatusCreated)
-	io.WriteString(w, "http://localhost:8888/"+miniURL)
+	io.WriteString(w, "http://localhost:8080/"+miniURL)
 }
 
 func methodGet(w http.ResponseWriter, r *http.Request) {
