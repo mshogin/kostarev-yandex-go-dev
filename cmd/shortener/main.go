@@ -9,7 +9,7 @@ func main() {
 	mux := http.NewServeMux()
 	mux.HandleFunc("/", handlers.CompressHandler)
 
-	err := http.ListenAndServe(":8080", mux)
+	err := http.ListenAndServe(":8888", mux)
 	if err != nil {
 		panic(err)
 	}
