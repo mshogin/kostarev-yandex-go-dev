@@ -1,13 +1,13 @@
 package app
 
-var M = map[string]string{}
+var M = map[string][]byte{}
 
-func SaveUrls(url, miniURL string) {
+func SaveUrls(url []byte, miniURL string) {
 	miniURL = "/" + miniURL
 	M[miniURL] = url
 }
 
-func GetURL(miniURL string) string {
+func GetURL(miniURL string) []byte {
 	if miniURL != "" {
 		_, ok := M[miniURL]
 		if ok {
@@ -15,5 +15,5 @@ func GetURL(miniURL string) string {
 		}
 	}
 
-	return ""
+	return []byte("")
 }
