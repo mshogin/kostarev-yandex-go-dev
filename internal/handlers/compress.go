@@ -14,10 +14,10 @@ func methodPost(w http.ResponseWriter, r *http.Request) {
 	}
 
 	miniURL := app.RandomURL()
-	app.SaveUrls(body, miniURL)
+	app.SaveUrls(string(body), miniURL)
 
-	//w.Write([]byte("http://localhost:8080/" + miniURL))
 	w.WriteHeader(http.StatusCreated)
+	io.WriteString(w, "http://localhost:8888/"+miniURL)
 }
 
 func methodGet(w http.ResponseWriter, r *http.Request) {
@@ -26,8 +26,9 @@ func methodGet(w http.ResponseWriter, r *http.Request) {
 		w.WriteHeader(http.StatusBadRequest)
 	}
 
-	m := app.GetURL(url)
-	w.Header().Add("Location", string(m))
+	m := app.M[url]
+
+	w.Header().Add("Location", m)
 	w.WriteHeader(http.StatusTemporaryRedirect)
 }
 

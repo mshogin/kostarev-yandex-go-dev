@@ -1,19 +1,13 @@
 package app
 
-var M = map[string][]byte{}
+var M = map[string]string{}
 
-func SaveUrls(url []byte, miniURL string) {
+func SaveUrls(url string, miniURL string) {
 	miniURL = "/" + miniURL
 	M[miniURL] = url
 }
 
-func GetURL(miniURL string) []byte {
-	if miniURL != "" {
-		_, ok := M[miniURL]
-		if ok {
-			return M[miniURL]
-		}
-	}
-
-	return []byte("")
+func GetURL(miniURL string) string {
+	m := M[miniURL]
+	return m
 }
