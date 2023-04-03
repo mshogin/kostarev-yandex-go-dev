@@ -26,7 +26,7 @@ func methodGet(w http.ResponseWriter, r *http.Request) {
 		w.WriteHeader(http.StatusBadRequest)
 	}
 
-	m := app.M[url]
+	m := app.GetURL(url)
 
 	w.Header().Add("Location", m)
 	w.WriteHeader(http.StatusTemporaryRedirect)
