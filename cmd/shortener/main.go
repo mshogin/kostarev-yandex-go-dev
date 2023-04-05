@@ -10,7 +10,7 @@ import (
 func main() {
 	r := chi.NewRouter()
 
-	r.Get("/", handlers.GetURLHandler)
+	r.Get("/{id}", handlers.GetURLHandler)
 	r.Post("/", handlers.CompressHandler)
 
 	log.Fatal(http.ListenAndServe(":8080", r))
