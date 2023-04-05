@@ -5,7 +5,7 @@ import (
 	"net/http"
 )
 
-func GetUrlHandler(w http.ResponseWriter, r *http.Request) {
+func GetURLHandler(w http.ResponseWriter, r *http.Request) {
 	w.Header().Set("Content-Type", "text/plain")
 
 	if r.Method != http.MethodGet {
