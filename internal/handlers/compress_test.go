@@ -11,7 +11,7 @@ func TestMethodPost(t *testing.T) {
 
 	emptyBodyRes := httptest.NewRecorder()
 
-	methodPost(emptyBodyRes, emptyBodyReq)
+	CompressHandler(emptyBodyRes, emptyBodyReq)
 
 	if emptyBodyRes.Code != http.StatusBadRequest {
 		t.Errorf("Ожидался статус код %v, получен %v", http.StatusBadRequest, emptyBodyRes.Code)

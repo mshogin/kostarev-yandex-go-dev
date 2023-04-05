@@ -2,15 +2,16 @@ package main
 
 import (
 	"github.com/IKostarev/yandex-go-dev/internal/handlers"
+	"github.com/go-chi/chi/v5"
+	"log"
 	"net/http"
 )
 
 func main() {
-	mux := http.NewServeMux()
-	mux.HandleFunc("/", handlers.CompressHandler)
+	r := chi.NewRouter()
 
-	err := http.ListenAndServe(":8080", mux)
-	if err != nil {
-		panic(err)
-	}
+	r.Get("/", handlers.GetUrlHandler)
+	r.Post("/{id}", handlers.CompressHandler)
+
+	log.Fatal(http.ListenAndServe(":8080", r))
 }

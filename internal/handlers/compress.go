@@ -6,7 +6,13 @@ import (
 	"net/http"
 )
 
-func methodPost(w http.ResponseWriter, r *http.Request) {
+func CompressHandler(w http.ResponseWriter, r *http.Request) {
+	w.Header().Set("Content-Type", "text/plain")
+
+	if r.Method != http.MethodPost {
+		w.WriteHeader(http.StatusBadRequest)
+	}
+
 	body, _ := io.ReadAll(r.Body)
 
 	if len(body) == 0 {
@@ -18,28 +24,4 @@ func methodPost(w http.ResponseWriter, r *http.Request) {
 
 	w.WriteHeader(http.StatusCreated)
 	io.WriteString(w, "http://localhost:8080/"+miniURL)
-}
-
-func methodGet(w http.ResponseWriter, r *http.Request) {
-	url := r.URL.String()
-	if url == "" {
-		w.WriteHeader(http.StatusBadRequest)
-	}
-
-	m := app.GetURL(url)
-
-	w.Header().Add("Location", m)
-	w.WriteHeader(http.StatusTemporaryRedirect)
-}
-
-func CompressHandler(w http.ResponseWriter, r *http.Request) {
-	w.Header().Set("Content-Type", "text/plain")
-
-	if r.Method == http.MethodPost {
-		methodPost(w, r)
-	} else if r.Method == http.MethodGet {
-		methodGet(w, r)
-	} else {
-		w.WriteHeader(http.StatusBadRequest)
-	}
 }
