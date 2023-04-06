@@ -2,11 +2,10 @@ package main
 
 import (
 	"github.com/IKostarev/yandex-go-dev/config"
-	"log"
-	"net/http"
-
 	"github.com/IKostarev/yandex-go-dev/internal/handlers"
 	"github.com/go-chi/chi/v5"
+	"log"
+	"net/http"
 )
 
 func main() {
