@@ -18,7 +18,7 @@ func LoadConfig() Config {
 
 	// Обработка флагов командной строки.
 	flag.StringVar(&httpAddr, "a", ":8888", "HTTP server address")
-	flag.StringVar(&baseShortURL, "b", "http://localhost:8000", "Base shortened URL")
+	flag.StringVar(&baseShortURL, "b", "http://localhost:8080", "Base shortened URL")
 	flag.Parse()
 
 	// Проверка наличия корректного протокола в базовом URL.
