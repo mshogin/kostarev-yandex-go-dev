@@ -1,7 +1,6 @@
 package main
 
 import (
-	"fmt"
 	"github.com/IKostarev/yandex-go-dev/config"
 	"log"
 	"net/http"
@@ -12,8 +11,6 @@ import (
 
 func main() {
 	cfg := config.LoadConfig()
-	fmt.Printf("HTTP server address: %s\n", cfg.HTTPAddr)
-	fmt.Printf("Base shortened URL: %s\n", cfg.BaseShortURL)
 
 	r := chi.NewRouter()
 
