@@ -5,32 +5,24 @@ import (
 	"strings"
 )
 
-type Config struct {
-	Host         string
-	Port         string
-	BaseShortURL string
+var (
+	HttpAddr     *string
+	BaseShortURL *string
+)
+
+func init() {
+	HttpAddr = flag.String("a", "localhost:8080", "HTTP server address")
+	BaseShortURL = flag.String("b", "http://localhost", "Base shortened URL")
 }
 
-func LoadConfig() Config {
-	var httpAddr string
-	var baseShortURL string
+func LoadConfig() (string, string) {
+	host, port := splitHostURL(*HttpAddr)
 
-	flag.StringVar(&httpAddr, "a", "http://localhost:8080", "HTTP server address")
-	flag.StringVar(&baseShortURL, "b", "http://localhost:8080", "Base shortened URL")
-	flag.Parse()
-
-	host, port := splitHostURL(httpAddr)
-
-	return Config{
-		Host:         host,
-		Port:         port,
-		BaseShortURL: baseShortURL,
-	}
+	return host, port
 }
 
 func splitHostURL(httpAddr string) (string, string) {
-	value := strings.Split(httpAddr, "://")
-	url := strings.Split(value[1], ":")
+	url := strings.Split(httpAddr, ":")
 
 	return url[0], ":" + url[1]
 }
