@@ -2,31 +2,35 @@ package config
 
 import (
 	"flag"
+	"strings"
 )
 
-// Config структура конфигурации.
 type Config struct {
-	HTTPAddr     string // Адрес HTTP-сервера.
-	BaseShortURL string // Базовый адрес результирующего сокращённого URL.
+	Host         string
+	Port         string
+	BaseShortURL string
 }
 
-// LoadConfig инициализирует и возвращает структуру конфигурации.
 func LoadConfig() Config {
 	var httpAddr string
 	var baseShortURL string
 
-	// Обработка флагов командной строки.
-	flag.StringVar(&httpAddr, "a", ":8080", "HTTP server address")
+	flag.StringVar(&httpAddr, "a", "http://localhost:8080", "HTTP server address")
 	flag.StringVar(&baseShortURL, "b", "http://localhost:8080", "Base shortened URL")
 	flag.Parse()
 
-	// Проверка наличия корректного протокола в базовом URL.
-	//if baseShortURL[:4] != "http" {
-	//	baseShortURL = fmt.Sprintf("http://%s", baseShortURL)
-	//}
+	host, port := splitHostURL(httpAddr)
 
 	return Config{
-		HTTPAddr:     httpAddr,
+		Host:         host,
+		Port:         port,
 		BaseShortURL: baseShortURL,
 	}
+}
+
+func splitHostURL(httpAddr string) (string, string) {
+	value := strings.Split(httpAddr, "://")
+	url := strings.Split(value[1], ":")
+
+	return url[0], ":" + url[1]
 }
