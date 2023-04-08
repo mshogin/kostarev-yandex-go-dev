@@ -1,6 +1,7 @@
 package handlers
 
 import (
+	"github.com/IKostarev/yandex-go-dev/config"
 	"github.com/IKostarev/yandex-go-dev/internal/app"
 	"io"
 	"net/http"
@@ -8,6 +9,7 @@ import (
 
 func CompressHandler(w http.ResponseWriter, r *http.Request) {
 	w.Header().Set("Content-Type", "text/plain")
+	cfg := config.LoadConfig()
 
 	if r.Method != http.MethodPost {
 		w.WriteHeader(http.StatusBadRequest)
@@ -23,5 +25,5 @@ func CompressHandler(w http.ResponseWriter, r *http.Request) {
 	app.SaveUrls(string(body), miniURL)
 
 	w.WriteHeader(http.StatusCreated)
-	io.WriteString(w, "http://localhost:8080/"+miniURL)
+	io.WriteString(w, cfg.BaseShortURL+"/"+miniURL)
 }

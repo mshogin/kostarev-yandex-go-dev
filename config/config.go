@@ -2,7 +2,6 @@ package config
 
 import (
 	"flag"
-	"fmt"
 )
 
 // Config структура конфигурации.
@@ -17,14 +16,14 @@ func LoadConfig() Config {
 	var baseShortURL string
 
 	// Обработка флагов командной строки.
-	flag.StringVar(&httpAddr, "a", ":8888", "HTTP server address")
-	flag.StringVar(&baseShortURL, "b", "http://localhost:8080", "Base shortened URL")
+	flag.StringVar(&httpAddr, "a", "http://localhost:8888", "HTTP server address")
+	flag.StringVar(&baseShortURL, "b", "http://localhost:8888", "Base shortened URL")
 	flag.Parse()
 
 	// Проверка наличия корректного протокола в базовом URL.
-	if baseShortURL[:4] != "http" {
-		baseShortURL = fmt.Sprintf("http://%s", baseShortURL)
-	}
+	//if baseShortURL[:4] != "http" {
+	//	baseShortURL = fmt.Sprintf("http://%s", baseShortURL)
+	//}
 
 	return Config{
 		HTTPAddr:     httpAddr,
