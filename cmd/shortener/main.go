@@ -16,5 +16,8 @@ func main() {
 	r.Get("/{id}", handlers.GetURLHandler)
 	r.Post("/", handlers.CompressHandler)
 
-	log.Fatal(http.ListenAndServe(cfg.HTTPAddr, r))
+	err := http.ListenAndServe(cfg.HTTPAddr, r)
+	if err != nil {
+		log.Fatal(err)
+	}
 }
