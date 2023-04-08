@@ -1,6 +1,7 @@
 package handlers
 
 import (
+	"fmt"
 	"github.com/IKostarev/yandex-go-dev/internal/app"
 	"net/http"
 )
@@ -13,11 +14,13 @@ func GetURLHandler(w http.ResponseWriter, r *http.Request) {
 	}
 
 	url := r.URL.String()
+	fmt.Println("r.URL.String() = ", url)
 	if url == "" {
 		w.WriteHeader(http.StatusBadRequest)
 	}
 
 	m := app.GetURL(url)
+	fmt.Println(m)
 
 	w.Header().Add("Location", m)
 	w.WriteHeader(http.StatusTemporaryRedirect)

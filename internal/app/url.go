@@ -1,10 +1,14 @@
 package app
 
+import "fmt"
+
 var M = map[string]string{}
 
 func SaveUrls(url string, miniURL string) {
 	miniURL = "/" + miniURL
 	M[miniURL] = url
+
+	fmt.Println(M[miniURL], " ", url)
 }
 
 func GetURL(miniURL string) string {
