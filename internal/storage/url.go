@@ -15,7 +15,7 @@ func SaveURL(url string) string {
 func GetURL(miniURL string) (string, error) {
 	m := M[miniURL]
 	if m == "" {
-		return "", errors.New("Don't have miniURL")
+		return "", errors.New("don't have miniURL")
 	}
 
 	return m, nil
