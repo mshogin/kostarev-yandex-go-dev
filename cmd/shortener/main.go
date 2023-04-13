@@ -20,5 +20,7 @@ func main() {
 	r.Get("/{id}", app.GetURLHandler)
 	r.Post("/", app.CompressHandler)
 
+	log.Printf("server starting on port: %v", cfg.Port)
+
 	log.Fatal(http.ListenAndServe(cfg.Port, r))
 }
