@@ -22,14 +22,15 @@ type Config struct {
 func LoadConfig() Config {
 	if envRunAddr := os.Getenv("SERVER_ADDRESS"); envRunAddr != "" {
 		HTTPAddr = &envRunAddr
+	} else {
+		HTTPAddr = flag.String("a", "localhost:8080", "HTTP server address")
 	}
 
 	if envBaseAddr := os.Getenv("BASE_URL"); envBaseAddr != "" {
 		BaseShortURL = &envBaseAddr
+	} else {
+		BaseShortURL = flag.String("b", "http://localhost", "Base shortened URL")
 	}
-
-	HTTPAddr = flag.String("a", "localhost:8080", "HTTP server address")
-	BaseShortURL = flag.String("b", "http://localhost", "Base shortened URL")
 
 	if _, err := url.ParseRequestURI(*BaseShortURL); err != nil {
 		log.Fatal("you didn't enter a url")
