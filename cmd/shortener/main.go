@@ -13,7 +13,7 @@ func main() {
 	flag.Parse()
 
 	cfg := config.LoadConfig()
-	app := handlers.App{cfg}
+	app := handlers.App{Config: cfg}
 
 	r := chi.NewRouter()
 
