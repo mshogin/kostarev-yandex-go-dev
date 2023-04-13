@@ -2,6 +2,8 @@ package config
 
 import (
 	"flag"
+	"log"
+	"net/url"
 	"os"
 	"strings"
 )
@@ -11,7 +13,13 @@ var (
 	BaseShortURL *string
 )
 
-func init() {
+type Config struct {
+	Host    string
+	Port    string
+	BaseURL string
+}
+
+func LoadConfig() Config {
 	if envRunAddr := os.Getenv("SERVER_ADDRESS"); envRunAddr != "" {
 		HTTPAddr = &envRunAddr
 	}
@@ -21,13 +29,19 @@ func init() {
 	}
 
 	HTTPAddr = flag.String("a", "localhost:8080", "HTTP server address")
-	BaseShortURL = flag.String("b", "http://localhost", "Base shortened URL")	
-}
+	BaseShortURL = flag.String("b", "http://localhost", "Base shortened URL")
 
-func LoadConfig() (string, string) {
+	if _, err := url.ParseRequestURI(*BaseShortURL); err != nil {
+		log.Fatal("you didn't enter a url")
+	}
+
 	host, port := splitHostURL(*HTTPAddr)
 
-	return host, port
+	return Config{
+		Host:    host,
+		Port:    port,
+		BaseURL: *BaseShortURL,
+	}
 }
 
 func splitHostURL(httpAddr string) (string, string) {

@@ -2,7 +2,7 @@ package main
 
 import (
 	"flag"
-	"github.com/IKostarev/yandex-go-dev/config"
+	"github.com/IKostarev/yandex-go-dev/internal/config"
 	"github.com/IKostarev/yandex-go-dev/internal/handlers"
 	"github.com/go-chi/chi/v5"
 	"log"
@@ -12,12 +12,13 @@ import (
 func main() {
 	flag.Parse()
 
-	_, port := config.LoadConfig()
+	cfg := config.LoadConfig()
+	app := handlers.App{cfg}
 
 	r := chi.NewRouter()
 
-	r.Get("/{id}", handlers.GetURLHandler)
-	r.Post("/", handlers.CompressHandler)
+	r.Get("/{id}", app.GetURLHandler)
+	r.Post("/", app.CompressHandler)
 
-	log.Fatal(http.ListenAndServe(port, r))
+	log.Fatal(http.ListenAndServe(cfg.Port, r))
 }

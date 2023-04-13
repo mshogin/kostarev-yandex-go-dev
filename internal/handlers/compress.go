@@ -1,36 +1,33 @@
 package handlers
 
 import (
-	"github.com/IKostarev/yandex-go-dev/config"
-	"github.com/IKostarev/yandex-go-dev/internal/app"
+	"github.com/IKostarev/yandex-go-dev/internal/config"
+	"github.com/IKostarev/yandex-go-dev/internal/storage"
 	"io"
 	"net/http"
+	"net/url"
 )
 
-func CompressHandler(w http.ResponseWriter, r *http.Request) {
+func (a *App) CompressHandler(w http.ResponseWriter, r *http.Request) {
 	w.Header().Set("Content-Type", "text/plain")
 
-	if r.Method != http.MethodPost {
+	body, err := io.ReadAll(r.Body)
+	if err != nil {
 		w.WriteHeader(http.StatusBadRequest)
 	}
-
-	body, _ := io.ReadAll(r.Body)
 
 	if len(body) == 0 {
 		w.WriteHeader(http.StatusBadRequest)
+		return
 	}
 
-	miniURL := app.RandomURL()
+	miniURL := storage.SaveURL(string(body))
 
-	_, port := config.LoadConfig()
-
-	app.SaveUrls(string(body), miniURL)
-
-	if *config.BaseShortURL == "http://localhost" {
-		w.WriteHeader(http.StatusCreated)
-		io.WriteString(w, *config.BaseShortURL+port+"/"+miniURL)
-	} else {
-		w.WriteHeader(http.StatusCreated)
-		io.WriteString(w, *config.BaseShortURL+"/"+miniURL)
+	newURL, err := url.JoinPath(*config.BaseShortURL, miniURL)
+	if err != nil {
+		w.WriteHeader(http.StatusBadRequest)
 	}
+
+	w.WriteHeader(http.StatusCreated)
+	io.WriteString(w, newURL)
 }

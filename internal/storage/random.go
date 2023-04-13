@@ -1,11 +1,13 @@
-package app
+package storage
 
 import "math/rand"
 
-func RandomURL() string {
+const letters = 8
+
+func randomString() string {
 	alphabet := []rune("ABCDEFGHIJKLMNOPQRSTUVWXYZabcdefghijklmnopqrstuvwxyz")
 
-	b := make([]rune, 8)
+	b := make([]rune, letters)
 	for i := range b {
 		b[i] = alphabet[rand.Intn(len(alphabet))]
 	}
