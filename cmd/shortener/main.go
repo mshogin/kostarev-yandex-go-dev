@@ -1,7 +1,6 @@
 package main
 
 import (
-	"flag"
 	"github.com/IKostarev/yandex-go-dev/internal/config"
 	"github.com/IKostarev/yandex-go-dev/internal/handlers"
 	"github.com/go-chi/chi/v5"
@@ -10,7 +9,6 @@ import (
 )
 
 func main() {
-	flag.Parse()
 
 	cfg := config.LoadConfig()
 	app := handlers.App{Config: cfg}
@@ -20,7 +18,7 @@ func main() {
 	r.Get("/{id}", app.GetURLHandler)
 	r.Post("/", app.CompressHandler)
 
-	log.Printf("server starting on port: %v", cfg.Port)
+	log.Printf("server starting on port: %v", *cfg.ServerAddr)
 
-	log.Fatal(http.ListenAndServe(cfg.Port, r))
+	log.Fatal(http.ListenAndServe(*cfg.ServerAddr, r))
 }

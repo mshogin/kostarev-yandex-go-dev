@@ -23,13 +23,11 @@ func (a *App) CompressHandler(w http.ResponseWriter, r *http.Request) {
 
 	miniURL := storage.SaveURL(string(body))
 
-	newURL, err := url.JoinPath(a.Config.BaseURL, miniURL)
+	newURL, err := url.JoinPath(*a.Config.BaseShortURL, miniURL)
 	if err != nil {
 		w.WriteHeader(http.StatusBadRequest)
 	}
 
 	w.WriteHeader(http.StatusCreated)
-	if _, err := io.WriteString(w, newURL); err != nil {
-		w.WriteHeader(http.StatusBadRequest)
-	}
+	io.WriteString(w, newURL)
 }
