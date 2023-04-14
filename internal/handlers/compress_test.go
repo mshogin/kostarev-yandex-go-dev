@@ -1,6 +1,7 @@
 package handlers
 
 import (
+	"github.com/IKostarev/yandex-go-dev/internal/config"
 	"net/http"
 	"net/http/httptest"
 	"strings"
@@ -8,7 +9,8 @@ import (
 )
 
 func TestCompressHandler(t *testing.T) {
-	app := &App{}
+	cfg := config.LoadConfig()
+	app := &App{Config: cfg}
 	w := httptest.NewRecorder()
 	body := "http://example.com"
 	r := httptest.NewRequest("POST", "/", strings.NewReader(body))
@@ -20,8 +22,12 @@ func TestCompressHandler(t *testing.T) {
 	}
 
 	responseBody := w.Body.String()
-	if responseBody == "" {
+	if len(responseBody) == 0 {
 		t.Errorf("Тело ответа пустое")
+	}
+
+	if err := r.Body.Close(); err != nil {
+		t.Errorf("Ошибка закрытия тела запроса: %v", err)
 	}
 }
 
