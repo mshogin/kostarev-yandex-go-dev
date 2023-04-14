@@ -11,7 +11,6 @@ type Config struct {
 }
 
 func LoadConfig() Config {
-
 	serverAddrDefault := ":8080"
 	baseShortURL := "http://localhost:8080"
 

@@ -1,11 +1,13 @@
 package storage
 
-import "errors"
+import (
+	"errors"
+)
 
 var M = map[string]string{}
 
 func SaveURL(url string) string {
-	miniURL := randomString()
+	miniURL := "/" + randomString() // необходимо добавлять / потому что потом без него не находится элемент
 
 	M[miniURL] = url
 

@@ -29,5 +29,7 @@ func (a *App) CompressHandler(w http.ResponseWriter, r *http.Request) {
 	}
 
 	w.WriteHeader(http.StatusCreated)
-	io.WriteString(w, newURL)
+	if _, err := io.WriteString(w, newURL); err != nil {
+		w.WriteHeader(http.StatusBadRequest)
+	}
 }

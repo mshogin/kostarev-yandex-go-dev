@@ -9,7 +9,6 @@ import (
 )
 
 func main() {
-
 	cfg := config.LoadConfig()
 	app := handlers.App{Config: cfg}
 
@@ -17,8 +16,6 @@ func main() {
 
 	r.Get("/{id}", app.GetURLHandler)
 	r.Post("/", app.CompressHandler)
-
-	log.Printf("server starting on port: %v", *cfg.ServerAddr)
 
 	log.Fatal(http.ListenAndServe(*cfg.ServerAddr, r))
 }
