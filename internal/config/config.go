@@ -21,7 +21,7 @@ type Config struct {
 
 func init() {
 	HTTPAddr = flag.String("a", "localhost:8080", "HTTP server address")
-	BaseShortURL = flag.String("b", "http://localhost:8080", "Base shortened URL")
+	BaseShortURL = flag.String("b", "http://localhost", "Base shortened URL")
 }
 
 func LoadConfig() Config {
