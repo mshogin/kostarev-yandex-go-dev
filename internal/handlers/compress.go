@@ -3,6 +3,7 @@ package handlers
 import (
 	"github.com/IKostarev/yandex-go-dev/internal/storage"
 	"io"
+	"log"
 	"net/http"
 	"net/url"
 )
@@ -30,6 +31,6 @@ func (a *App) CompressHandler(w http.ResponseWriter, r *http.Request) {
 
 	w.WriteHeader(http.StatusCreated)
 	if _, err := io.WriteString(w, newURL); err != nil {
-		w.WriteHeader(http.StatusBadRequest)
+		log.Fatal("Failed to send URL")
 	}
 }
