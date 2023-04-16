@@ -9,7 +9,11 @@ import (
 )
 
 func main() {
-	cfg := config.LoadConfig()
+	cfg, err := config.LoadConfig()
+	if err != nil {
+		log.Fatal("Can't read config: %w", err)
+	}
+
 	app := handlers.App{Config: cfg}
 
 	r := chi.NewRouter()

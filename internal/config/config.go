@@ -2,7 +2,7 @@ package config
 
 import (
 	"flag"
-	"log"
+	"fmt"
 	"net/url"
 	"os"
 )
@@ -17,17 +17,20 @@ type Config struct {
 	BaseShortURL string
 }
 
-func LoadConfig() Config {
+func LoadConfig() (Config, error) {
 	cfg := Config{
 		ServerAddr:   serverAddrDefault,
 		BaseShortURL: baseShortURLDefault,
 	}
 
 	cfg.loadEnv()
-	cfg.loadFlags()
-	cfg.validate()
 
-	return cfg
+	cfg.loadFlags()
+	if err := cfg.validate(); err != nil {
+		return cfg, fmt.Errorf("cant validate config: %w", err)
+	}
+
+	return cfg, nil
 }
 
 func (cfg *Config) loadEnv() {
@@ -47,9 +50,11 @@ func (cfg *Config) loadFlags() {
 	flag.Parse()
 }
 
-func (cfg *Config) validate() {
+func (cfg *Config) validate() error {
 	_, err := url.Parse(cfg.BaseShortURL)
 	if err != nil {
-		log.Fatal("You entered an invalid URL")
+		return fmt.Errorf("cant parse base short ulr: %w", err)
 	}
+
+	return nil
 }

@@ -18,6 +18,7 @@ func (a *App) GetURLHandler(w http.ResponseWriter, r *http.Request) {
 	m, err := storage.GetURL(url)
 	if err != nil {
 		w.WriteHeader(http.StatusBadRequest) //TODO в будущем переделать на http.StatusNotFound
+		return
 	}
 
 	w.Header().Add("Location", m)
