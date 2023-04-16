@@ -2,18 +2,22 @@ package config
 
 import (
 	"flag"
+	"log"
+	"net/url"
 	"os"
 )
 
+const (
+	serverAddrDefault   = ":8080"
+	baseShortURLDefault = "http://localhost:8080"
+)
+
 type Config struct {
-	ServerAddr   *string
-	BaseShortURL *string
+	ServerAddr   string
+	BaseShortURL string
 }
 
 func LoadConfig() Config {
-	serverAddrDefault := ":8080"
-	baseShortURL := "http://localhost:8080"
-
 	cfg := Config{
 		ServerAddr:   serverAddrDefault,
 		BaseShortURL: baseShortURLDefault,
@@ -21,6 +25,7 @@ func LoadConfig() Config {
 
 	cfg.loadEnv()
 	cfg.loadFlags()
+	cfg.validate()
 
 	return cfg
 }
@@ -40,4 +45,11 @@ func (cfg *Config) loadFlags() {
 	flag.StringVar(&cfg.BaseShortURL, "b", cfg.BaseShortURL, "Base shortened URL")
 
 	flag.Parse()
+}
+
+func (cfg *Config) validate() {
+	_, err := url.Parse(cfg.BaseShortURL)
+	if err != nil {
+		log.Fatal("You entered an invalid URL")
+	}
 }
