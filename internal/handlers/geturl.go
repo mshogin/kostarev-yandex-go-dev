@@ -12,6 +12,7 @@ func (a *App) GetURLHandler(w http.ResponseWriter, r *http.Request) {
 	url := chi.URLParam(r, "id")
 	if url == "" {
 		w.WriteHeader(http.StatusBadRequest)
+		return
 	}
 
 	m, err := storage.GetURL(url)
