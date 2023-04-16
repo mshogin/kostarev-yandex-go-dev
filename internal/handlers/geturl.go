@@ -2,13 +2,14 @@ package handlers
 
 import (
 	"github.com/IKostarev/yandex-go-dev/internal/storage"
+	"github.com/go-chi/chi/v5"
 	"net/http"
 )
 
 func (a *App) GetURLHandler(w http.ResponseWriter, r *http.Request) {
 	w.Header().Set("Content-Type", "text/plain")
 
-	url := r.URL.String()
+	url := chi.URLParam(r, "id")
 	if url == "" {
 		w.WriteHeader(http.StatusBadRequest)
 	}

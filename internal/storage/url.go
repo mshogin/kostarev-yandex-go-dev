@@ -7,7 +7,7 @@ import (
 var M = map[string]string{}
 
 func SaveURL(url string) string {
-	miniURL := "/" + randomString() // необходимо добавлять / потому что потом без него не находится элемент
+	miniURL := randomString()
 
 	M[miniURL] = url
 
