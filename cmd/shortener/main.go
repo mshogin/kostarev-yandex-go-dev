@@ -17,5 +17,5 @@ func main() {
 	r.Get("/{id}", app.GetURLHandler)
 	r.Post("/", app.CompressHandler)
 
-	log.Fatal(http.ListenAndServe(*cfg.ServerAddr, r))
+	log.Fatal(http.ListenAndServe(cfg.ServerAddr, r))
 }

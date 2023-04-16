@@ -15,8 +15,8 @@ func LoadConfig() Config {
 	baseShortURL := "http://localhost:8080"
 
 	cfg := Config{
-		ServerAddr:   &serverAddrDefault,
-		BaseShortURL: &baseShortURL,
+		ServerAddr:   serverAddrDefault,
+		BaseShortURL: baseShortURLDefault,
 	}
 
 	cfg.loadEnv()
@@ -27,17 +27,17 @@ func LoadConfig() Config {
 
 func (cfg *Config) loadEnv() {
 	if envRunAddr := os.Getenv("SERVER_ADDRESS"); envRunAddr != "" {
-		cfg.ServerAddr = &envRunAddr
+		cfg.ServerAddr = envRunAddr
 	}
 
 	if envBaseAddr := os.Getenv("BASE_URL"); envBaseAddr != "" {
-		cfg.BaseShortURL = &envBaseAddr
+		cfg.BaseShortURL = envBaseAddr
 	}
 }
 
 func (cfg *Config) loadFlags() {
-	flag.StringVar(cfg.ServerAddr, "a", *cfg.ServerAddr, "HTTP server address")
-	flag.StringVar(cfg.BaseShortURL, "b", *cfg.BaseShortURL, "Base shortened URL")
+	flag.StringVar(&cfg.ServerAddr, "a", cfg.ServerAddr, "HTTP server address")
+	flag.StringVar(&cfg.BaseShortURL, "b", cfg.BaseShortURL, "Base shortened URL")
 
 	flag.Parse()
 }
