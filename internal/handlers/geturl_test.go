@@ -21,7 +21,7 @@ func TestGetURLHandler(t *testing.T) {
 }
 
 func TestGetURLHandler_BadRequest(t *testing.T) {
-	app := &App{} // создаем экземпляр приложения для тестирования
+	app := &App{}
 	w := httptest.NewRecorder()
 	r := httptest.NewRequest("GET", "/", nil)
 

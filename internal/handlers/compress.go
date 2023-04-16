@@ -25,7 +25,7 @@ func (a *App) CompressHandler(w http.ResponseWriter, r *http.Request) {
 
 	newURL, err := url.JoinPath(*a.Config.BaseShortURL, miniURL)
 	if err != nil {
-		w.WriteHeader(http.StatusBadRequest)
+		w.WriteHeader(http.StatusBadRequest) //TODO в будущем переделать на http.StatusInternalServerError
 	}
 
 	w.WriteHeader(http.StatusCreated)
