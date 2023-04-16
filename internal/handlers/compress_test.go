@@ -9,7 +9,11 @@ import (
 )
 
 func TestCompressHandler(t *testing.T) {
-	cfg := config.LoadConfig()
+	cfg, err := config.LoadConfig()
+	if err != nil {
+		t.Errorf("Не удалось прочитать config: %v", err)
+	}
+
 	app := &App{Config: cfg}
 	w := httptest.NewRecorder()
 	body := "http://example.com"
