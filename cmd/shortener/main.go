@@ -19,8 +19,8 @@ func main() {
 
 	r := chi.NewRouter()
 
-	r.Get("/{id}", logger.RequestLogger(app.GetURLHandler))
-	r.Post("/", logger.ResponseLogger(app.CompressHandler))
+	r.Get("/{id}", logger.ResponseLogger(app.GetURLHandler))
+	r.Post("/", logger.RequestLogger(app.CompressHandler))
 
 	log.Fatal(http.ListenAndServe(cfg.ServerAddr, r))
 }

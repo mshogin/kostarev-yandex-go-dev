@@ -6,7 +6,7 @@ import (
 	"time"
 )
 
-var sugar zap.SugaredLogger
+var sugar = zap.NewExample().Sugar()
 
 func RequestLogger(h http.HandlerFunc) http.HandlerFunc {
 	return func(w http.ResponseWriter, r *http.Request) {
