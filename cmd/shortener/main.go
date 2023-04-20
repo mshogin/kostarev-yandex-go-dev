@@ -3,6 +3,7 @@ package main
 import (
 	"github.com/IKostarev/yandex-go-dev/internal/config"
 	"github.com/IKostarev/yandex-go-dev/internal/handlers"
+	"github.com/IKostarev/yandex-go-dev/internal/logger"
 	"github.com/go-chi/chi/v5"
 	"log"
 	"net/http"
@@ -18,8 +19,8 @@ func main() {
 
 	r := chi.NewRouter()
 
-	r.Get("/{id}", app.GetURLHandler)
-	r.Post("/", app.CompressHandler)
+	r.Get("/{id}", logger.RequestLogger(app.GetURLHandler))
+	r.Post("/", logger.ResponseLogger(app.CompressHandler))
 
 	log.Fatal(http.ListenAndServe(cfg.ServerAddr, r))
 }
