@@ -2,6 +2,7 @@ package handlers
 
 import (
 	"bytes"
+	"fmt"
 	"github.com/IKostarev/yandex-go-dev/internal/storage"
 	"github.com/andybalholm/brotli"
 	"github.com/go-chi/chi/v5"
@@ -43,11 +44,17 @@ func (a *App) GetURLHandler(w http.ResponseWriter, r *http.Request) {
 	content := strings.Contains(r.Header.Get("Content-Encoding"), "gzip")
 
 	if accept || content {
+		fmt.Println(accept)
+		fmt.Println(content)
 		data, _ := BrotliCompress([]byte(m)) //TODO обработать ошибку
+		fmt.Println("m = ", m)
+		fmt.Println("data = ", data)
+		fmt.Println("data = ", string(data))
 		w.Header().Add("Location", string(data))
 		w.Header().Set("Accept-Encoding", "gzip")
 	} else {
 		w.Header().Add("Location", m)
+		fmt.Println("m = ", m)
 	}
 	w.WriteHeader(http.StatusTemporaryRedirect)
 }
