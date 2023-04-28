@@ -9,7 +9,7 @@ import (
 )
 
 func (a *App) CompressHandler(w http.ResponseWriter, r *http.Request) {
-	w.Header().Set("Content-Type", "text/plain")
+	//w.Header().Set("Content-Type", "text/plain")
 
 	body, err := io.ReadAll(r.Body)
 	if err != nil {
@@ -31,6 +31,7 @@ func (a *App) CompressHandler(w http.ResponseWriter, r *http.Request) {
 	}
 
 	w.WriteHeader(http.StatusCreated)
+	w.Header().Set("Accept-Encoding", "gzip")
 	if _, err := io.WriteString(w, newURL); err != nil {
 		log.Fatal("Failed to send URL")
 	}
