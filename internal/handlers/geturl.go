@@ -6,6 +6,7 @@ import (
 	"github.com/andybalholm/brotli"
 	"github.com/go-chi/chi/v5"
 	"net/http"
+	"strings"
 )
 
 func BrotliCompress(data []byte) ([]byte, error) {
@@ -38,16 +39,15 @@ func (a *App) GetURLHandler(w http.ResponseWriter, r *http.Request) {
 		return
 	}
 
-	data := []byte(m)
-	//fmt.Println("data create = ", string(data))
-	data, err = BrotliCompress(data)
+	accept := strings.Contains(r.Header.Get("Accept-Encoding"), "gzip")
+	content := strings.Contains(r.Header.Get("Content-Encoding"), "gzip")
 
-	//fmt.Println("data posle compress = ", string(data))
-
-	w.Header().Add("Location", string(data))
-
-	//fmt.Println("m = ", m)
-
-	w.Header().Set("Accept-Encoding", "gzip")
+	if accept || content {
+		data, _ := BrotliCompress([]byte(m)) //TODO обработать ошибку
+		w.Header().Add("Location", string(data))
+		w.Header().Set("Accept-Encoding", "gzip")
+	} else {
+		w.Header().Add("Location", m)
+	}
 	w.WriteHeader(http.StatusTemporaryRedirect)
 }
