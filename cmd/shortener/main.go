@@ -20,7 +20,7 @@ func main() {
 
 	r := chi.NewRouter()
 
-	r.Get("/{id}", logger.ResponseLogger(app.GetURLHandler))
+	r.Get("/{id}", logger.ResponseLogger(middleware.GzipMiddleware(app.GetURLHandler)))
 	r.Post("/", logger.RequestLogger(middleware.GzipMiddleware(app.CompressHandler)))
 	r.Post("/api/shorten", middleware.GzipMiddleware(app.JSONHandler))
 
