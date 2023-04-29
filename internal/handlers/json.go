@@ -17,8 +17,6 @@ type Result struct {
 }
 
 func (a *App) JSONHandler(w http.ResponseWriter, r *http.Request) {
-	//w.Header().Set("Content-Type", "application/json")
-
 	var url URL
 	var res Result
 
@@ -42,8 +40,8 @@ func (a *App) JSONHandler(w http.ResponseWriter, r *http.Request) {
 		return
 	}
 
+	w.Header().Set("Content-Type", "application/json")
 	w.WriteHeader(http.StatusCreated)
-	w.Header().Set("Accept-Encoding", "gzip")
 	if _, err := w.Write(resp); err != nil {
 		log.Fatal("Failed to send URL on json handler")
 	}

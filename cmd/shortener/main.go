@@ -3,9 +3,7 @@ package main
 import (
 	"github.com/IKostarev/yandex-go-dev/internal/config"
 	"github.com/IKostarev/yandex-go-dev/internal/handlers"
-	"github.com/IKostarev/yandex-go-dev/internal/logger"
-	"github.com/IKostarev/yandex-go-dev/internal/middleware"
-	"github.com/go-chi/chi/v5"
+	"github.com/IKostarev/yandex-go-dev/internal/router"
 	"log"
 	"net/http"
 )
@@ -18,11 +16,7 @@ func main() {
 
 	app := handlers.App{Config: cfg}
 
-	r := chi.NewRouter()
-
-	r.Get("/{id}", logger.ResponseLogger(middleware.GzipMiddleware(app.GetURLHandler)))
-	r.Post("/", logger.RequestLogger(middleware.GzipMiddleware(app.CompressHandler)))
-	r.Post("/api/shorten", middleware.GzipMiddleware(app.JSONHandler))
+	r := router.NewRouter(app)
 
 	log.Fatal(http.ListenAndServe(cfg.ServerAddr, r))
 }
