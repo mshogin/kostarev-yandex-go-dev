@@ -1,7 +1,7 @@
 package handlers
 
 import (
-	"github.com/IKostarev/yandex-go-dev/internal/storage"
+	"github.com/IKostarev/yandex-go-dev/internal/service"
 	"io"
 	"log"
 	"net/http"
@@ -15,7 +15,7 @@ func (a *App) CompressHandler(w http.ResponseWriter, r *http.Request) {
 		return
 	}
 
-	miniURL := storage.SaveURL(string(body))
+	miniURL := service.SaveURL(string(body))
 
 	newURL, err := url.JoinPath(a.Config.BaseShortURL, miniURL)
 	if err != nil {

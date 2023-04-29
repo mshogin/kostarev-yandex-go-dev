@@ -1,7 +1,7 @@
 package handlers
 
 import (
-	"github.com/IKostarev/yandex-go-dev/internal/storage"
+	"github.com/IKostarev/yandex-go-dev/internal/service"
 	"net/http"
 	"net/http/httptest"
 	"testing"
@@ -13,7 +13,7 @@ func TestGetURLHandler(t *testing.T) {
 	url := "http://ya.com"
 	r := httptest.NewRequest("GET", url, nil)
 
-	storage.SaveURL(url)
+	service.SaveURL(url)
 
 	app.GetURLHandler(w, r)
 

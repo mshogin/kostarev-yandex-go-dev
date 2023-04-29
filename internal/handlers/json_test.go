@@ -3,7 +3,7 @@ package handlers
 import (
 	"bytes"
 	"encoding/json"
-	"github.com/IKostarev/yandex-go-dev/internal/storage"
+	"github.com/IKostarev/yandex-go-dev/internal/service"
 	"net/http"
 	"net/http/httptest"
 	"testing"
@@ -35,7 +35,7 @@ func TestJSONHandler(t *testing.T) {
 		t.Fatalf("Failed to unmarshal response body: %v", err)
 	}
 
-	url = storage.SaveURL(url)
+	url = service.SaveURL(url)
 	responseMap["result"] = url
 
 	expectedURL := app.Config.BaseShortURL + url

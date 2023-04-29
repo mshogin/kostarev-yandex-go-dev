@@ -2,7 +2,7 @@ package handlers
 
 import (
 	"encoding/json"
-	"github.com/IKostarev/yandex-go-dev/internal/storage"
+	"github.com/IKostarev/yandex-go-dev/internal/service"
 	"log"
 	"net/http"
 	url1 "net/url"
@@ -25,7 +25,7 @@ func (a *App) JSONHandler(w http.ResponseWriter, r *http.Request) {
 		return
 	}
 
-	miniURL := storage.SaveURL(url.ServerURL)
+	miniURL := service.SaveURL(url.ServerURL)
 
 	var err error
 	res.BaseShortURL, err = url1.JoinPath(a.Config.BaseShortURL, miniURL)
