@@ -3,7 +3,6 @@ package handlers
 import (
 	"bufio"
 	"encoding/json"
-	"errors"
 	"fmt"
 	"os"
 )
@@ -18,10 +17,10 @@ func (a *App) FilePath() string {
 	return a.Config.FileStoragePath
 }
 
-func (a *App) FileStorage(shortURL, originURL string) error {
+func (a *App) FileStorage(shortURL, originURL string) {
 	path := a.FilePath()
 	if path == "" {
-		return errors.New("error path file")
+		return
 	}
 
 	urlData := &URLData{
@@ -32,21 +31,19 @@ func (a *App) FileStorage(shortURL, originURL string) error {
 
 	jsonData, err := json.Marshal(urlData)
 	if err != nil {
-		return err
+		return
 	}
 
 	file, err := os.Create(path)
 	if err != nil {
-		return err
+		return
 	}
 	defer file.Close()
 
 	_, err = file.Write(jsonData)
 	if err != nil {
-		return err
+		return
 	}
-
-	return nil
 }
 
 func countLines(filePath string) int {

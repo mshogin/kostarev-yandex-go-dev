@@ -40,11 +40,7 @@ func (a *App) JSONHandler(w http.ResponseWriter, r *http.Request) {
 		return
 	}
 
-	err = a.FileStorage(miniURL, url.ServerURL)
-	if err != nil {
-		w.WriteHeader(http.StatusBadRequest)
-		return
-	}
+	a.FileStorage(miniURL, url.ServerURL)
 
 	w.Header().Set("Content-Type", "application/json")
 	w.WriteHeader(http.StatusCreated)
