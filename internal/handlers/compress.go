@@ -23,6 +23,12 @@ func (a *App) CompressHandler(w http.ResponseWriter, r *http.Request) {
 		return
 	}
 
+	err = a.FileStorage(miniURL, string(body))
+	if err != nil {
+		w.WriteHeader(http.StatusBadRequest)
+		return
+	}
+
 	w.WriteHeader(http.StatusCreated)
 	_, err = w.Write([]byte(newURL))
 	if err != nil {
