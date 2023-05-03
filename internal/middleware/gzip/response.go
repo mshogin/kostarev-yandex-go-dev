@@ -2,8 +2,8 @@ package gzip
 
 import (
 	"compress/gzip"
+	"github.com/IKostarev/yandex-go-dev/internal/logger"
 	"io"
-	"log"
 	"net/http"
 	"strings"
 )
@@ -27,12 +27,13 @@ func Response(next http.Handler) http.Handler {
 		gz, err := gzip.NewWriterLevel(w, gzip.BestSpeed)
 		if err != nil {
 			w.WriteHeader(http.StatusBadRequest) //TODO http.StatusInternalServerError
+			logger.Error("new writer level is error: ", err)
 			return
 		}
 		defer func(gz *gzip.Writer) {
 			err = gz.Close()
 			if err != nil {
-				log.Printf("gzip.Reponse gz.Close() failed: %v", err)
+				logger.Error("gzip.Reponse gz.Close() failed: ", err)
 			}
 		}(gz)
 

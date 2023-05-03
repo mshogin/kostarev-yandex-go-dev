@@ -2,7 +2,7 @@ package gzip
 
 import (
 	"compress/gzip"
-	"log"
+	"github.com/IKostarev/yandex-go-dev/internal/logger"
 	"net/http"
 	"strings"
 )
@@ -13,6 +13,7 @@ func Request(next http.Handler) http.Handler {
 			gz, err := gzip.NewReader(r.Body)
 			if err != nil {
 				w.WriteHeader(http.StatusBadRequest) //TODO http.StatusInternalServerError
+				logger.Error("new reader is error: ", err)
 				return
 			}
 
@@ -20,7 +21,7 @@ func Request(next http.Handler) http.Handler {
 			defer func(gz *gzip.Reader) {
 				err = gz.Close()
 				if err != nil {
-					log.Printf("GzipRequest gz.Close() failed: %v", err)
+					logger.Error("GzipRequest gz.Close() failed: %v", err)
 				}
 			}(gz)
 		}

@@ -3,6 +3,7 @@ package config
 import (
 	"flag"
 	"fmt"
+	"github.com/IKostarev/yandex-go-dev/internal/logger"
 	"net/url"
 	"os"
 	"path/filepath"
@@ -62,16 +63,16 @@ func (cfg *Config) loadFlags() {
 func (cfg *Config) validate() error {
 	_, err := url.Parse(cfg.BaseShortURL)
 	if err != nil {
-		return fmt.Errorf("cant parse base short ulr: %w", err)
+		logger.Error("cant parse base short ulr: ", err)
 	}
 
 	path := filepath.IsLocal(cfg.FileStoragePath)
 	if path {
-		return fmt.Errorf("file path storage is bad: %w", err)
+		logger.Error("file path storage is bad: ", err)
 	}
 
 	if len(cfg.ServerAddr) < 5 {
-		return fmt.Errorf("server address is bad: %w", err)
+		logger.Error("server address is bad: ", err)
 	}
 
 	return nil

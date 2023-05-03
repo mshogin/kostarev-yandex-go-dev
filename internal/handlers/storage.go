@@ -4,6 +4,7 @@ import (
 	"bufio"
 	"encoding/json"
 	"fmt"
+	"github.com/IKostarev/yandex-go-dev/internal/logger"
 	"os"
 )
 
@@ -38,7 +39,11 @@ func (a *App) FileStorage(shortURL, originURL string) {
 	if err != nil {
 		return
 	}
-	defer file.Close()
+	defer func(file *os.File) {
+		if err := file.Close(); err != nil {
+			logger.Error("close file is error: ", err)
+		}
+	}(file)
 
 	_, err = file.Write(jsonData)
 	if err != nil {
@@ -51,7 +56,11 @@ func countLines(filePath string) int {
 	if err != nil {
 		return 0
 	}
-	defer file.Close()
+	defer func(file *os.File) {
+		if err := file.Close(); err != nil {
+			logger.Error("close file is error: ", err)
+		}
+	}(file)
 
 	reader := bufio.NewReader(file)
 
