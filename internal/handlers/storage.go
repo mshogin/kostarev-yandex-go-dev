@@ -14,15 +14,8 @@ type URLData struct {
 	OriginalURL string `json:"original_url"`
 }
 
-func (a *App) FilePath() string {
-	return a.Config.FileStoragePath
-}
-
-func (a *App) FileStorage(shortURL, originURL string) {
-	path := a.FilePath()
-	if path == "" {
-		return
-	}
+func (a *App) StoreFile(shortURL, originURL string) {
+	path := a.Config.FileStoragePath
 
 	urlData := &URLData{
 		UUID:        fmt.Sprintf("%d", countLines(path)+1),

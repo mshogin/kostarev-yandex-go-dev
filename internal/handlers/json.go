@@ -43,7 +43,7 @@ func (a *App) JSONHandler(w http.ResponseWriter, r *http.Request) {
 		return
 	}
 
-	a.FileStorage(miniURL, url.ServerURL)
+	a.StoreFile(miniURL, url.ServerURL)
 
 	w.Header().Set("Content-Type", "application/json")
 	w.WriteHeader(http.StatusCreated)
