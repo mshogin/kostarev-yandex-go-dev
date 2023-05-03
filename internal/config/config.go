@@ -5,6 +5,7 @@ import (
 	"fmt"
 	"net/url"
 	"os"
+	"path/filepath"
 )
 
 const (
@@ -62,6 +63,15 @@ func (cfg *Config) validate() error {
 	_, err := url.Parse(cfg.BaseShortURL)
 	if err != nil {
 		return fmt.Errorf("cant parse base short ulr: %w", err)
+	}
+
+	path := filepath.IsLocal(cfg.FileStoragePath)
+	if path {
+		return fmt.Errorf("file path storage is bad: %w", err)
+	}
+
+	if len(cfg.ServerAddr) < 5 {
+		return fmt.Errorf("server address is bad: %w", err)
 	}
 
 	return nil
