@@ -65,7 +65,7 @@ func (m *Fs) Save(long string) (string, error) {
 		return "cannot write to file", err
 	}
 
-	m.count++ // = m.count++
+	m.count++
 
 	return urlData.ShortURL, nil
 }
