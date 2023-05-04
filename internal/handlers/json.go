@@ -3,7 +3,6 @@ package handlers
 import (
 	"encoding/json"
 	"github.com/IKostarev/yandex-go-dev/internal/logger"
-	"github.com/IKostarev/yandex-go-dev/internal/service"
 	"net/http"
 	url1 "net/url"
 )
@@ -26,10 +25,14 @@ func (a *App) JSONHandler(w http.ResponseWriter, r *http.Request) {
 		return
 	}
 
-	miniURL := service.SaveURL(url.ServerURL)
+	short, err := a.Storage.Save(url.ServerURL)
+	if err != nil {
+		w.WriteHeader(http.StatusBadRequest)
+		logger.Error("storage save is error: ", err)
+		return
+	}
 
-	var err error
-	res.BaseShortURL, err = url1.JoinPath(a.Config.BaseShortURL, miniURL)
+	res.BaseShortURL, err = url1.JoinPath(a.Config.BaseShortURL, short)
 	if err != nil {
 		w.WriteHeader(http.StatusBadRequest)
 		logger.Error("join path have err: ", err)
@@ -42,8 +45,6 @@ func (a *App) JSONHandler(w http.ResponseWriter, r *http.Request) {
 		logger.Error("json marshal is error: ", err)
 		return
 	}
-
-	a.StoreFile(miniURL, url.ServerURL)
 
 	w.Header().Set("Content-Type", "application/json")
 	w.WriteHeader(http.StatusCreated)

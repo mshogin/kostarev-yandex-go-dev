@@ -2,7 +2,6 @@ package handlers
 
 import (
 	"github.com/IKostarev/yandex-go-dev/internal/logger"
-	"github.com/IKostarev/yandex-go-dev/internal/service"
 	"github.com/go-chi/chi/v5"
 	"net/http"
 )
@@ -15,10 +14,11 @@ func (a *App) GetURLHandler(w http.ResponseWriter, r *http.Request) {
 		return
 	}
 
-	m, err := service.GetURL(url)
-	if err != nil {
+	m := a.Storage.Get(url)
+
+	if m == "" {
 		w.WriteHeader(http.StatusBadRequest) //TODO в будущем переделать на http.StatusNotFound
-		logger.Error("get url is bad: ", err)
+		logger.Error("get url is bad: ", m)
 		return
 	}
 

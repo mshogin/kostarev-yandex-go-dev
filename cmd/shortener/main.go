@@ -5,6 +5,7 @@ import (
 	"github.com/IKostarev/yandex-go-dev/internal/handlers"
 	"github.com/IKostarev/yandex-go-dev/internal/logger"
 	"github.com/IKostarev/yandex-go-dev/internal/router"
+	"github.com/IKostarev/yandex-go-dev/internal/storage/fs"
 	"log"
 	"net/http"
 )
@@ -15,7 +16,8 @@ func main() {
 		logger.Error("Can't read config: ", err)
 	}
 
-	app := handlers.App{Config: cfg}
+	storage := fs.Load(cfg)
+	app := handlers.App{Config: cfg, Storage: storage}
 
 	r := router.NewRouter(app)
 

@@ -2,7 +2,6 @@ package handlers
 
 import (
 	"github.com/IKostarev/yandex-go-dev/internal/logger"
-	"github.com/IKostarev/yandex-go-dev/internal/service"
 	"io"
 	"net/http"
 	"net/url"
@@ -16,19 +15,22 @@ func (a *App) CompressHandler(w http.ResponseWriter, r *http.Request) {
 		return
 	}
 
-	miniURL := service.SaveURL(string(body))
+	short, err := a.Storage.Save(string(body))
+	if err != nil {
+		w.WriteHeader(http.StatusBadRequest) //TODO в будущем переделать на http.StatusInternalServerError
+		logger.Error("storage save is error: ", err)
+		return
+	}
 
-	newURL, err := url.JoinPath(a.Config.BaseShortURL, miniURL)
+	long, err := url.JoinPath(a.Config.BaseShortURL, short)
 	if err != nil {
 		w.WriteHeader(http.StatusBadRequest) //TODO в будущем переделать на http.StatusInternalServerError
 		logger.Error("join path have err: ", err)
 		return
 	}
 
-	a.StoreFile(miniURL, string(body))
-
 	w.WriteHeader(http.StatusCreated)
-	_, err = w.Write([]byte(newURL))
+	_, err = w.Write([]byte(long))
 	if err != nil {
 		logger.Error("Failed to send URL: ", err)
 	}
