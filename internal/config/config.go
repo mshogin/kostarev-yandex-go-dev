@@ -6,7 +6,6 @@ import (
 	"github.com/IKostarev/yandex-go-dev/internal/logger"
 	"net/url"
 	"os"
-	"path/filepath"
 )
 
 const (
@@ -66,10 +65,10 @@ func (cfg *Config) validate() error {
 		logger.Error("cant parse base short ulr: ", err)
 	}
 
-	path := filepath.IsLocal(cfg.FileStoragePath)
-	if path {
-		logger.Error("file path storage is bad: ", err)
-	}
+	//path := filepath.IsLocal(cfg.FileStoragePath)
+	//if path {
+	//	logger.Error("file path storage is bad: ", err)
+	//}
 
 	if len(cfg.ServerAddr) < 5 {
 		logger.Error("server address is bad: ", err)
