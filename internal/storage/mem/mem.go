@@ -1,7 +1,7 @@
 package mem
 
 import (
-	"github.com/IKostarev/yandex-go-dev/internal/service"
+	"github.com/IKostarev/yandex-go-dev/internal/utils"
 )
 
 type Mem struct {
@@ -9,7 +9,7 @@ type Mem struct {
 }
 
 func (m *Mem) Save(long string) (string, error) {
-	short := service.RandomString()
+	short := utils.RandomString()
 
 	m.memory[short] = long
 

@@ -6,7 +6,7 @@ import (
 	"fmt"
 	"github.com/IKostarev/yandex-go-dev/internal/config"
 	"github.com/IKostarev/yandex-go-dev/internal/logger"
-	"github.com/IKostarev/yandex-go-dev/internal/service"
+	"github.com/IKostarev/yandex-go-dev/internal/utils"
 	"os"
 )
 
@@ -51,7 +51,7 @@ func Load(cfg config.Config) *Fs {
 func (m *Fs) Save(long string) (string, error) {
 	urlData := &URLData{
 		UUID:        fmt.Sprintf("%d", m.count),
-		ShortURL:    service.RandomString(),
+		ShortURL:    utils.RandomString(),
 		OriginalURL: long,
 	}
 
@@ -64,6 +64,8 @@ func (m *Fs) Save(long string) (string, error) {
 	if err != nil {
 		return "cannot write to file", err
 	}
+
+	m.count++ // = m.count++
 
 	return urlData.ShortURL, nil
 }
