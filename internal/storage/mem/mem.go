@@ -9,11 +9,11 @@ type Mem struct {
 }
 
 func (m *Mem) Save(long string) (string, error) {
-	short := utils.RandomString()
+	short := utils.RandomString
 
-	m.memory[short] = long
+	m.memory[short()] = long
 
-	return short, nil
+	return short(), nil
 }
 
 func (m *Mem) Get(short string) string {
@@ -26,5 +26,5 @@ func (m *Mem) Get(short string) string {
 }
 
 func (m *Mem) Close() error {
-	return m.Close()
+	return nil
 }

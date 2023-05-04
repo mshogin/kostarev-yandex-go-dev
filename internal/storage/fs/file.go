@@ -5,7 +5,6 @@ import (
 	"encoding/json"
 	"fmt"
 	"github.com/IKostarev/yandex-go-dev/internal/config"
-	"github.com/IKostarev/yandex-go-dev/internal/logger"
 	"github.com/IKostarev/yandex-go-dev/internal/utils"
 	"os"
 )
@@ -23,13 +22,15 @@ type URLData struct {
 }
 
 func Load(cfg config.Config) *Fs {
-	file, _ := os.OpenFile(cfg.FileStoragePath, os.O_WRONLY|os.O_CREATE|os.O_APPEND, 0777)
+	file, err := os.OpenFile(cfg.FileStoragePath, os.O_WRONLY|os.O_CREATE|os.O_APPEND, 0777)
+	if err != nil {
+		//TODO
+	}
+
 	//TODO не знаю как обработать здесь ошибку
-	defer func(file *os.File) {
-		if err := file.Close(); err != nil {
-			logger.Error("close file is error: ", err)
-		}
-	}(file)
+	defer func() {
+		err = file.Close()
+	}()
 
 	reader := bufio.NewReader(file)
 
