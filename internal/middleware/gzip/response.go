@@ -26,16 +26,15 @@ func Response(next http.Handler) http.Handler {
 
 		gz, err := gzip.NewWriterLevel(w, gzip.BestSpeed)
 		if err != nil {
-			w.WriteHeader(http.StatusBadRequest) //TODO http.StatusInternalServerError
+			w.WriteHeader(http.StatusBadRequest)
 			logger.Error("new writer level is error: ", err)
 			return
 		}
-		defer func(gz *gzip.Writer) {
-			err = gz.Close()
-			if err != nil {
-				logger.Error("gzip.Reponse gz.Close() failed: ", err)
+		defer func() {
+			if err = gz.Close(); err != nil {
+				logger.Error("gzip.Response gz.Close() failed: ", err)
 			}
-		}(gz)
+		}()
 
 		w.Header().Set("Content-Encoding", "gzip")
 		next.ServeHTTP(gzipWriter{ResponseWriter: w, Writer: gz}, r)
