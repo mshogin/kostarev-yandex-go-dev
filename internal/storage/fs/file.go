@@ -4,9 +4,10 @@ import (
 	"bufio"
 	"encoding/json"
 	"fmt"
-	"github.com/IKostarev/yandex-go-dev/internal/config"
 	"github.com/IKostarev/yandex-go-dev/internal/utils"
+	"io"
 	"os"
+	"strings"
 )
 
 type Fs struct {
@@ -21,32 +22,34 @@ type URLData struct {
 	OriginalURL string `json:"original_url"`
 }
 
-func Load(cfg config.Config) *Fs {
-	file, err := os.OpenFile(cfg.FileStoragePath, os.O_WRONLY|os.O_CREATE|os.O_APPEND, 0777)
-	if err != nil {
-		//TODO
+func NewFs(file *os.File) (*Fs, error) {
+	fs := &Fs{
+		fh:    file,
+		cache: make(map[string]string),
+		count: 0,
 	}
-
-	//TODO не знаю как обработать здесь ошибку
-	defer func() {
-		err = file.Close()
-	}()
 
 	reader := bufio.NewReader(file)
 
-	var count int64
 	for {
-		_, err := reader.ReadString('\n')
-		if err != nil {
+		bytes, err := reader.ReadBytes('\n')
+		if err == io.EOF {
 			break
 		}
-		count++
+		if err != nil {
+			return nil, err
+		}
+
+		line := strings.Trim(string(bytes), "\n")
+		spl := strings.Split(line, ",")
+
+		id := spl[0]
+		url := spl[1]
+
+		fs.cache[id] = url
 	}
 
-	return &Fs{
-		fh:    file,
-		count: count,
-	}
+	return fs, nil
 }
 
 func (m *Fs) Save(long string) (string, error) {
@@ -72,6 +75,9 @@ func (m *Fs) Save(long string) (string, error) {
 }
 
 func (m *Fs) Get(short string) string {
+	fmt.Println("file get short = ", short)
+	fmt.Println("file get m.cache[short] = ", m.cache[short])
+
 	return m.cache[short]
 }
 

@@ -4,7 +4,7 @@ import "math/rand"
 
 const letters = 8
 
-var RandomString = func() string {
+func RandomString() string {
 	alphabet := []rune("ABCDEFGHIJKLMNOPQRSTUVWXYZabcdefghijklmnopqrstuvwxyz")
 
 	b := make([]rune, letters)
