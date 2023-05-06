@@ -4,6 +4,7 @@ import (
 	"bufio"
 	"encoding/json"
 	"fmt"
+	"github.com/IKostarev/yandex-go-dev/internal/logger"
 	"github.com/IKostarev/yandex-go-dev/internal/utils"
 	"io"
 	"os"
@@ -34,9 +35,11 @@ func NewFs(file *os.File) (*Fs, error) {
 	for {
 		bytes, err := reader.ReadBytes('\n')
 		if err == io.EOF {
+			logger.Error("newFs, io.EOF is error: ", err)
 			break
 		}
 		if err != nil {
+			logger.Error("reader is error: ", err)
 			return nil, err
 		}
 
@@ -61,11 +64,13 @@ func (m *Fs) Save(long string) (string, error) {
 
 	jsonData, err := json.Marshal(urlData)
 	if err != nil {
+		logger.Error("marshal json error: ", err)
 		return "cannot marshal json", err
 	}
 
 	_, err = m.fh.Write(jsonData)
 	if err != nil {
+		logger.Error("write json data error: ", err)
 		return "cannot write to file", err
 	}
 

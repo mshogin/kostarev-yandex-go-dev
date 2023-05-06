@@ -31,6 +31,7 @@ func LoadConfig() (Config, error) {
 
 	cfg.loadFlags()
 	if err := cfg.validate(); err != nil {
+		logger.Error("have error in validate: ", err)
 		return cfg, fmt.Errorf("cant validate config: %w", err)
 	}
 

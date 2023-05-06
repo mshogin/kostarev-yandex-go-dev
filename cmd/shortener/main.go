@@ -17,6 +17,10 @@ func main() {
 	}
 
 	storage, err := store.NewStorage(cfg)
+	if err != nil {
+		logger.Error("Can't storage download", err)
+	}
+
 	app := handlers.App{Config: cfg, Storage: storage}
 
 	r := router.NewRouter(app)
