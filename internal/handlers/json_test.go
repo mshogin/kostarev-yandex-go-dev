@@ -46,6 +46,7 @@ func TestApp_JSONHandler(t *testing.T) {
 				}
 				a.JSONHandler(w, r)
 			}))
+			defer ts.Close()
 
 			resp, err := http.Post(ts.URL+"/api/shorten", "application/json", bytes.NewBuffer(tt.body))
 			if err != nil {
@@ -55,7 +56,7 @@ func TestApp_JSONHandler(t *testing.T) {
 				t.Errorf("expected status code %v, got %v", tt.statusCode, resp.StatusCode)
 			}
 
-			ts.Close()
+			defer resp.Body.Close()
 		})
 	}
 }
