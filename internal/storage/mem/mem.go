@@ -1,7 +1,6 @@
 package mem
 
 import (
-	"fmt"
 	"github.com/IKostarev/yandex-go-dev/internal/utils"
 )
 
@@ -20,12 +19,7 @@ func NewMem() (*Mem, error) {
 func (m *Mem) Save(long string) (string, error) {
 	short := utils.RandomString()
 
-	fmt.Println("save long = ", long)
-	fmt.Println("save short = ", short)
-
 	m.memory[short] = long
-
-	fmt.Println("save m.memory[short] = ", m.memory[short])
 
 	return short, nil
 }
@@ -35,9 +29,6 @@ func (m *Mem) Get(short string) string {
 	if mini == "" {
 		return ""
 	}
-
-	fmt.Println("get mem short = ", short)
-	fmt.Println("get mem mini = ", mini)
 
 	return mini
 }

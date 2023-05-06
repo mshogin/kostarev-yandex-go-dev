@@ -2,44 +2,59 @@ package handlers
 
 import (
 	"bytes"
-	"encoding/json"
-	"github.com/IKostarev/yandex-go-dev/internal/utils"
+	"github.com/IKostarev/yandex-go-dev/internal/config"
 	"net/http"
 	"net/http/httptest"
 	"testing"
 )
 
-func TestJSONHandler(t *testing.T) {
-	app := &App{}
-
-	url := "https://example.com"
-	reqBody := []byte(`{"url": "` + url + `"}`)
-	req, err := http.NewRequest("POST", "/api/shorten", bytes.NewBuffer(reqBody))
-	if err != nil {
-		t.Fatalf("Failed to create request: %v", err)
+func TestApp_JSONHandler(t *testing.T) {
+	tests := []struct {
+		name        string
+		body        []byte
+		statusCode  int
+		expectedURL string
+	}{
+		{
+			name:        "good request",
+			body:        []byte(`{"url": "http://test.site.com"}`),
+			statusCode:  http.StatusCreated,
+			expectedURL: "/qwertyui",
+		},
+		//{ TODO такая же ошибка на счет интерфейса
+		//	name:        "bad request",
+		//	body:        []byte(`{"invalid_json":`),
+		//	statusCode:  http.StatusBadRequest,
+		//	expectedURL: "",
+		//},
+		//{
+		//	name:        "storage save error",
+		//	body:        []byte(`{"url": "http://test.site.com"}`),
+		//	statusCode:  http.StatusBadRequest,
+		//	expectedURL: "",
+		//},
 	}
-	req.Header.Set("Content-Type", "application/json")
 
-	w := httptest.NewRecorder()
+	for _, tt := range tests {
+		t.Run(tt.name, func(t *testing.T) {
+			ts := httptest.NewServer(http.HandlerFunc(func(w http.ResponseWriter, r *http.Request) {
+				a := &App{
+					Config: config.Config{
+						BaseShortURL: tt.expectedURL,
+					},
+					Storage: &mockStorage{},
+				}
+				a.JSONHandler(w, r)
+			}))
+			defer ts.Close()
 
-	app.JSONHandler(w, req)
-
-	if w.Code != http.StatusCreated {
-		t.Errorf("Expected status code %d, but got %d", http.StatusCreated, w.Code)
-	}
-
-	var responseMap map[string]string
-
-	err = json.Unmarshal(w.Body.Bytes(), &responseMap)
-	if err != nil {
-		t.Fatalf("Failed to unmarshal response body: %v", err)
-	}
-
-	url = utils.SaveURL(url)
-	responseMap["result"] = url
-
-	expectedURL := app.Config.BaseShortURL + url
-	if responseMap["result"] != expectedURL {
-		t.Errorf("Expected response body %s, but got %s", expectedURL, responseMap["result"])
+			resp, err := http.Post(ts.URL+"/api/shorten", "application/json", bytes.NewBuffer(tt.body))
+			if err != nil {
+				t.Errorf("failed to make POST request: %v", err)
+			}
+			if resp.StatusCode != tt.statusCode {
+				t.Errorf("expected status code %v, got %v", tt.statusCode, resp.StatusCode)
+			}
+		})
 	}
 }

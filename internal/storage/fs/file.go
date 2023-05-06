@@ -75,9 +75,6 @@ func (m *Fs) Save(long string) (string, error) {
 }
 
 func (m *Fs) Get(short string) string {
-	fmt.Println("file get short = ", short)
-	fmt.Println("file get m.cache[short] = ", m.cache[short])
-
 	return m.cache[short]
 }
 
