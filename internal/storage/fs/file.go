@@ -71,6 +71,7 @@ func (m *Fs) Save(long string) (string, error) {
 	}
 
 	m.count++
+	m.cache[urlData.ShortURL] = urlData.OriginalURL
 
 	return urlData.ShortURL, nil
 }
