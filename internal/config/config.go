@@ -2,7 +2,6 @@ package config
 
 import (
 	"flag"
-	"fmt"
 	"github.com/IKostarev/yandex-go-dev/internal/logger"
 	"net/url"
 	"os"
@@ -31,8 +30,8 @@ func LoadConfig() (Config, error) {
 
 	cfg.loadFlags()
 	if err := cfg.validate(); err != nil {
-		logger.Error("have error in validate: ", err)
-		return cfg, fmt.Errorf("cant validate config: %w", err)
+		logger.Fatalf("have error in validate: ", err)
+		return cfg, err
 	}
 
 	return cfg, nil
@@ -63,16 +62,11 @@ func (cfg *Config) loadFlags() {
 func (cfg *Config) validate() error {
 	_, err := url.Parse(cfg.BaseShortURL)
 	if err != nil {
-		logger.Error("cant parse base short ulr: ", err)
+		logger.Fatalf("cant parse base short ulr: ", err)
 	}
 
-	//path := filepath.IsLocal(cfg.FileStoragePath)
-	//if path {
-	//	logger.Error("file path storage is bad: ", err)
-	//}
-
 	if len(cfg.ServerAddr) < 5 {
-		logger.Error("server address is bad: ", err)
+		logger.Fatalf("server address is bad: ", err)
 	}
 
 	return nil

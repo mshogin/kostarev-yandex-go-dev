@@ -35,12 +35,10 @@ func NewFs(file *os.File) (*Fs, error) {
 	for {
 		bytes, err := reader.ReadBytes('\n')
 		if err == io.EOF {
-			logger.Error("newFs, io.EOF is error: ", err)
 			break
 		}
 		if err != nil {
-			logger.Error("reader is error: ", err)
-			return nil, err
+			return nil, logger.Errorf("reader is error: ", err)
 		}
 
 		line := strings.Trim(string(bytes), "\n")
@@ -64,14 +62,12 @@ func (m *Fs) Save(long string) (string, error) {
 
 	jsonData, err := json.Marshal(urlData)
 	if err != nil {
-		logger.Error("marshal json error: ", err)
-		return "cannot marshal json", err
+		return "", logger.Errorf("cannot marshal json: %w", err)
 	}
 
 	_, err = m.fh.Write(jsonData)
 	if err != nil {
-		logger.Error("write json data error: ", err)
-		return "cannot write to file", err
+		return "", logger.Errorf("cannot write to file: %w", err)
 	}
 
 	m.count++

@@ -21,18 +21,12 @@ func TestApp_JSONHandler(t *testing.T) {
 			statusCode:  http.StatusCreated,
 			expectedURL: "/qwertyui",
 		},
-		//{ TODO такая же ошибка на счет интерфейса
-		//	name:        "bad request",
-		//	body:        []byte(`{"invalid_json":`),
-		//	statusCode:  http.StatusBadRequest,
-		//	expectedURL: "",
-		//},
-		//{
-		//	name:        "storage save error",
-		//	body:        []byte(`{"url": "http://test.site.com"}`),
-		//	statusCode:  http.StatusBadRequest,
-		//	expectedURL: "",
-		//},
+		{
+			name:        "bad request",
+			body:        []byte(`{"invalid_json":`),
+			statusCode:  http.StatusBadRequest,
+			expectedURL: "",
+		},
 	}
 
 	for _, tt := range tests {

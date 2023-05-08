@@ -14,20 +14,17 @@ type Storage interface {
 	Close() error
 }
 
-func NewStorage(cfg config.Config) (Storage, error) {
-	var s Storage
-	var err error
-
+func NewStorage(cfg config.Config) (s Storage, err error) {
 	if path := cfg.FileStoragePath; path != "" {
 		var file *os.File
 
 		file, err := os.OpenFile(path, os.O_RDWR|os.O_CREATE|os.O_APPEND, 0777)
 		if err != nil {
-			return nil, err
+			return nil, logger.Errorf("cannot open file: %w", err)
 		}
 		defer func() {
 			if err = file.Close(); err != nil {
-				logger.Error("file close is error in storage: ", err)
+				err = logger.Errorf("file close is error in storage: ", err)
 			}
 		}()
 
@@ -36,7 +33,7 @@ func NewStorage(cfg config.Config) (Storage, error) {
 		s, err = mem.NewMem()
 	}
 	if err != nil {
-		return nil, err
+		return nil, logger.Errorf("cannot create storage: %w", err)
 	}
 
 	return s, nil

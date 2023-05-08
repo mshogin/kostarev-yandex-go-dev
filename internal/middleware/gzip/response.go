@@ -27,12 +27,12 @@ func Response(next http.Handler) http.Handler {
 		gz, err := gzip.NewWriterLevel(w, gzip.BestSpeed)
 		if err != nil {
 			w.WriteHeader(http.StatusBadRequest)
-			logger.Error("new writer level is error: ", err)
+			logger.Fatalf("new writer level is error: ", err)
 			return
 		}
 		defer func() {
 			if err = gz.Close(); err != nil {
-				logger.Error("gzip.Response gz.Close() failed: ", err)
+				logger.Fatalf("gzip.Response gz.Close() failed: ", err)
 			}
 		}()
 

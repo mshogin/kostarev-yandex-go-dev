@@ -16,9 +16,9 @@ func RequestLogger(h http.HandlerFunc) http.HandlerFunc {
 
 		duration := time.Since(start)
 		sugar.Infoln(
-			"path", r.RequestURI,
-			"method", r.Method,
-			"time duration", duration,
+			"path =", r.RequestURI,
+			"| method =", r.Method,
+			"| time duration =", duration,
 		)
 	}
 }

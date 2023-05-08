@@ -3,29 +3,14 @@ package utils
 import "testing"
 
 func TestRandomString(t *testing.T) {
-	str := RandomString()
+	str1 := RandomString()
+	str2 := RandomString()
 
-	tests := []struct {
-		name         string
-		randomString string
-		want         string
-	}{
-		{
-			name:         "good test",
-			randomString: str,
-			want:         str,
-		},
-		//{ TODO не знаю как обработать bad test
-		//	name:         "bad test",
-		//	randomString: "zxcvbnmk",
-		//	want:         str,
-		//},
+	if len(str1) < 1 {
+		t.Fatalf("bad random string: should be not empty")
 	}
-	for _, tt := range tests {
-		t.Run(tt.name, func(t *testing.T) {
-			if tt.randomString != tt.want {
-				t.Error("random string is not want")
-			}
-		})
+
+	if str1 == str2 {
+		t.Fatalf("bad random string: str1 should not be equals to str2")
 	}
 }

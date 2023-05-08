@@ -12,14 +12,15 @@ import (
 type mockStorage struct {
 	saveReturn string
 	saveErr    error
+	storage    map[string]string
 }
 
 func (m *mockStorage) Get(s string) string {
-	panic("")
+	return m.storage[s]
 }
 
 func (m *mockStorage) Close() error {
-	panic("")
+	return nil
 }
 
 func (m *mockStorage) Save(_ string) (string, error) {
@@ -44,14 +45,14 @@ func TestApp_CompressHandler(t *testing.T) {
 			statusCode: 201,
 			want:       []byte("http://localhost:8080/asdfghjk"),
 		},
-		//{ //TODO падает потому что тело пустое и интерфейс выдает ошибку
-		//	name:       "body nil test",
-		//	inputBody:  []byte(""),
-		//	shortURL:   "",
-		//	longURL:    "http://localhost:8080",
-		//	statusCode: 400,
-		//	want:       []byte(""),
-		//},
+		{
+			name:       "body nil test",
+			inputBody:  []byte(""),
+			shortURL:   "",
+			longURL:    "http://localhost:8080",
+			statusCode: 400,
+			want:       []byte(""),
+		},
 		{
 			name:       "finally url bad test",
 			inputBody:  []byte("http://test.site.com"),

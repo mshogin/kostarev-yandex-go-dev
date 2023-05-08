@@ -9,16 +9,16 @@ import (
 func (a *App) GetURLHandler(w http.ResponseWriter, r *http.Request) {
 	url := chi.URLParam(r, "id")
 	if url == "" {
+		_ = logger.Errorf("url param bad with id: ", url)
 		w.WriteHeader(http.StatusBadRequest)
-		logger.Error("url param bad with id: ", url)
 		return
 	}
 
 	m := a.Storage.Get(url)
 
 	if m == "" {
+		_ = logger.Errorf("get url is bad: ", m)
 		w.WriteHeader(http.StatusBadRequest) //TODO в будущем переделать на http.StatusNotFound
-		logger.Error("get url is bad: ", m)
 		return
 	}
 

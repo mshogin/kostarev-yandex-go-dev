@@ -40,8 +40,8 @@ func ResponseLogger(h http.HandlerFunc) http.HandlerFunc {
 		h.ServeHTTP(&lw, r)
 
 		sugar.Infoln(
-			"status code", responseData.status,
-			"size body", responseData.size,
+			"status code =", responseData.status,
+			"| size body =", responseData.size,
 		)
 	}
 }
