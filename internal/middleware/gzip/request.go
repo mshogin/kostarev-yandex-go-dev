@@ -7,12 +7,13 @@ import (
 	"strings"
 )
 
+// TODO тест
 func Request(next http.Handler) http.Handler {
 	return http.HandlerFunc(func(w http.ResponseWriter, r *http.Request) {
 		if strings.Contains(r.Header.Get("Content-Encoding"), "gzip") {
 			gz, err := gzip.NewReader(r.Body)
 			if err != nil {
-				_ = logger.Errorf("new reader is error: ", err)
+				_ = logger.Errorf("new reader is error: %w", err)
 				w.WriteHeader(http.StatusBadRequest)
 				return
 			}
@@ -20,7 +21,7 @@ func Request(next http.Handler) http.Handler {
 			r.Body = gz
 			defer func() {
 				if err = gz.Close(); err != nil {
-					_ = logger.Errorf("GzipRequest gz.Close() failed: %v", err)
+					_ = logger.Errorf("GzipRequest gz.Close() failed: %w", err)
 				}
 			}()
 		}

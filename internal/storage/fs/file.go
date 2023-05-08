@@ -38,7 +38,7 @@ func NewFs(file *os.File) (*Fs, error) {
 			break
 		}
 		if err != nil {
-			return nil, logger.Errorf("reader is error: ", err)
+			return nil, logger.Errorf("reader is error: %w", err)
 		}
 
 		line := strings.Trim(string(bytes), "\n")

@@ -24,7 +24,7 @@ func NewStorage(cfg config.Config) (s Storage, err error) {
 		}
 		defer func() {
 			if err = file.Close(); err != nil {
-				err = logger.Errorf("file close is error in storage: ", err)
+				err = logger.Errorf("file close is error in storage: %w", err)
 			}
 		}()
 

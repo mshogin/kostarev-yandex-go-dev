@@ -12,12 +12,12 @@ import (
 func main() {
 	cfg, err := config.LoadConfig()
 	if err != nil {
-		logger.Fatalf("Can't read config: ", err)
+		logger.Fatalf("Can't read config: %w", err)
 	}
 
 	storage, err := store.NewStorage(cfg)
 	if err != nil {
-		logger.Fatalf("Can't storage download", err)
+		logger.Fatalf("Can't storage download: %w", err)
 	}
 
 	app := handlers.NewApp(cfg, storage)
