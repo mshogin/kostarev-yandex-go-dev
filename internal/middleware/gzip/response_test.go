@@ -48,7 +48,7 @@ func TestResponse(t *testing.T) {
 		t.Fatalf("io.Copy() failed: %v", err)
 	}
 
-	if string(buf.Bytes()) != expected {
-		t.Errorf("handler returned unexpected body: got %v, want %v", string(buf.Bytes()), expected)
+	if buf.String() != expected {
+		t.Errorf("handler returned unexpected body: got %v, want %v", buf.String(), expected)
 	}
 }
