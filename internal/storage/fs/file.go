@@ -6,7 +6,6 @@ import (
 	"fmt"
 	"github.com/IKostarev/yandex-go-dev/internal/logger"
 	"github.com/IKostarev/yandex-go-dev/internal/utils"
-	"io"
 	"os"
 	"strings"
 )
@@ -30,24 +29,20 @@ func NewFs(file *os.File) (*Fs, error) {
 		count: 0,
 	}
 
-	reader := bufio.NewReader(file)
+	scanner := bufio.NewScanner(file)
 
-	for {
-		bytes, err := reader.ReadBytes('\n')
-		if err == io.EOF {
-			break
-		}
-		if err != nil {
-			return nil, logger.Errorf("reader is error: %w", err)
-		}
-
-		line := strings.Trim(string(bytes), "\n")
+	for scanner.Scan() {
+		line := scanner.Text()
 		spl := strings.Split(line, ",")
 
 		id := spl[0]
 		url := spl[1]
 
 		fs.cache[id] = url
+	}
+
+	if err := scanner.Err(); err != nil {
+		return nil, logger.Errorf("scanner is error: %w", err)
 	}
 
 	return fs, nil
