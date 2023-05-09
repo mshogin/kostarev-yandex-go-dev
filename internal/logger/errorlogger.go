@@ -6,9 +6,9 @@ import (
 )
 
 func Fatalf(str string, err error) {
-	log.Fatalf("ERROR: "+str, err)
+	log.Fatalf("FATAL: "+str, err)
 }
 
 func Errorf(str string, err error) error {
-	return fmt.Errorf(str, err)
+	return fmt.Errorf("ERROR: "+str, err)
 }
