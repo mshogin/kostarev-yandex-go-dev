@@ -11,5 +11,5 @@ func Fatalf(str string, err error) {
 
 func Errorf(format string, args ...any) {
 	msg := fmt.Sprintf(format, args...)
-	log.Printf(fmt.Sprintf("ERROR: %s", msg))
+	log.Printf("ERROR: %s\n", msg)
 }

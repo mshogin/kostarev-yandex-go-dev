@@ -10,7 +10,7 @@ import (
 func (a *App) GetURLHandler(w http.ResponseWriter, r *http.Request) {
 	url := chi.URLParam(r, "id")
 	if url == "" {
-		errors.New("url param bad with id")
+		_ = errors.New("url param bad with id")
 		w.WriteHeader(http.StatusBadRequest)
 		return
 	}

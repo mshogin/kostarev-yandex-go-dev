@@ -1,31 +1,42 @@
 package fs
 
 import (
-	"io/ioutil"
 	"os"
 	"path/filepath"
 	"testing"
 )
 
 func TestSaveAndGet(t *testing.T) {
-	dir, err := ioutil.TempDir("", "test_save_and_get")
-	if err != nil {
-		t.Fatalf("error creating temp dir: %v", err)
-	}
-	defer os.RemoveAll(dir)
+	dir := os.TempDir()
+	defer func(path string) {
+		err := os.RemoveAll(path)
+		if err != nil {
+			t.Fatalf("cannot remove temp dir: %v", err)
+		}
+	}(dir)
 
 	filename := filepath.Join(dir, "test.db")
 	file, err := os.Create(filename)
 	if err != nil {
 		t.Fatalf("error creating test file: %v", err)
 	}
-	defer file.Close()
+	defer func(file *os.File) {
+		err := file.Close()
+		if err != nil {
+			t.Fatalf("cannot close file: %v", err)
+		}
+	}(file)
 
 	fs, err := NewFs(file)
 	if err != nil {
 		t.Fatalf("error creating fs: %v", err)
 	}
-	defer fs.Close()
+	defer func(fs *Fs) {
+		err := fs.Close()
+		if err != nil {
+			t.Fatalf("cannot close file: %v", err)
+		}
+	}(fs)
 
 	original1 := "https://example.com/long/url1"
 	short1, err := fs.Save(original1)
@@ -63,7 +74,12 @@ func TestSaveAndGet(t *testing.T) {
 	if err != nil {
 		t.Fatalf("error opening test file: %v", err)
 	}
-	defer file2.Close()
+	defer func(file2 *os.File) {
+		err := file2.Close()
+		if err != nil {
+			t.Fatalf("cannot close file: %v", err)
+		}
+	}(file2)
 
 	fs2, err := NewFs(file2)
 	if err != nil {
