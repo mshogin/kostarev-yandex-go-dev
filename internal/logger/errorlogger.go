@@ -9,6 +9,7 @@ func Fatalf(str string, err error) {
 	log.Fatalf("FATAL: "+str, err)
 }
 
-func Errorf(str string, err error) error {
-	return fmt.Errorf("ERROR: "+str, err)
+func Errorf(format string, args ...any) {
+	msg := fmt.Sprintf(format, args...)
+	log.Printf(fmt.Sprintf("ERROR: %s", msg))
 }

@@ -12,7 +12,7 @@ func Request(next http.Handler) http.Handler {
 		if strings.Contains(r.Header.Get("Content-Encoding"), "gzip") {
 			gz, err := gzip.NewReader(r.Body)
 			if err != nil {
-				_ = logger.Errorf("new reader is error: %w", err)
+				logger.Errorf("new reader is error: %w", err)
 				w.WriteHeader(http.StatusBadRequest)
 				return
 			}
@@ -20,7 +20,7 @@ func Request(next http.Handler) http.Handler {
 			r.Body = gz
 			defer func() {
 				if err = gz.Close(); err != nil {
-					_ = logger.Errorf("GzipRequest gz.Close() failed: %w", err)
+					logger.Errorf("GzipRequest gz.Close() failed: %w", err)
 				}
 			}()
 		}

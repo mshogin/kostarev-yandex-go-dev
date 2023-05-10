@@ -9,7 +9,7 @@ import (
 func (a *App) GetURLHandler(w http.ResponseWriter, r *http.Request) {
 	url := chi.URLParam(r, "id")
 	if url == "" {
-		_ = logger.Errorf("url param bad with id: %w", nil)
+		logger.Errorf("url param bad with id: %w", nil)
 		w.WriteHeader(http.StatusBadRequest)
 		return
 	}
@@ -17,7 +17,7 @@ func (a *App) GetURLHandler(w http.ResponseWriter, r *http.Request) {
 	m := a.Storage.Get(url)
 
 	if m == "" {
-		_ = logger.Errorf("get url is bad: %w", nil)
+		logger.Errorf("get url is bad: %w", nil)
 		w.WriteHeader(http.StatusBadRequest) //TODO в будущем переделать на http.StatusNotFound
 		return
 	}

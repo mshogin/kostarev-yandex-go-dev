@@ -10,21 +10,21 @@ import (
 func (a *App) CompressHandler(w http.ResponseWriter, r *http.Request) {
 	body, err := io.ReadAll(r.Body)
 	if err != nil || len(body) == 0 {
-		_ = logger.Errorf("body is nil or empty: %w", err)
+		logger.Errorf("body is nil or empty: %w", err)
 		w.WriteHeader(http.StatusBadRequest)
 		return
 	}
 
 	short, err := a.Storage.Save(string(body))
 	if err != nil {
-		_ = logger.Errorf("storage save is error: %w", err)
+		logger.Errorf("storage save is error: %w", err)
 		w.WriteHeader(http.StatusBadRequest) //TODO в будущем переделать на http.StatusInternalServerError
 		return
 	}
 
 	long, err := url.JoinPath(a.Config.BaseShortURL, short)
 	if err != nil {
-		_ = logger.Errorf("join path have err: %w", err)
+		logger.Errorf("join path have err: %w", err)
 		w.WriteHeader(http.StatusBadRequest) //TODO в будущем переделать на http.StatusInternalServerError
 		return
 	}
@@ -32,6 +32,6 @@ func (a *App) CompressHandler(w http.ResponseWriter, r *http.Request) {
 	w.WriteHeader(http.StatusCreated)
 	_, err = w.Write([]byte(long))
 	if err != nil {
-		_ = logger.Errorf("Failed to send URL: %w", err)
+		logger.Errorf("Failed to send URL: %w", err)
 	}
 }

@@ -25,12 +25,7 @@ func (m *Mem) Save(long string) (string, error) {
 }
 
 func (m *Mem) Get(short string) string {
-	mini := m.memory[short]
-	if mini == "" {
-		return ""
-	}
-
-	return mini
+	return m.memory[short]
 }
 
 func (m *Mem) Close() error {
