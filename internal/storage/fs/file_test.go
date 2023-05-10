@@ -20,23 +20,11 @@ func TestSaveAndGet(t *testing.T) {
 	if err != nil {
 		t.Fatalf("error creating test file: %v", err)
 	}
-	defer func(file *os.File) {
-		err := file.Close()
-		if err != nil {
-			t.Fatalf("cannot close file: %v", err)
-		}
-	}(file)
 
 	fs, err := NewFs(file)
 	if err != nil {
 		t.Fatalf("error creating fs: %v", err)
 	}
-	defer func(fs *Fs) {
-		err := fs.Close()
-		if err != nil {
-			t.Fatalf("cannot close file: %v", err)
-		}
-	}(fs)
 
 	original1 := "https://example.com/long/url1"
 	short1, err := fs.Save(original1)
