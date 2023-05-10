@@ -2,11 +2,12 @@ package fs
 
 import (
 	"bufio"
+	"bytes"
 	"encoding/json"
 	"fmt"
+	"github.com/IKostarev/yandex-go-dev/internal/logger"
 	"github.com/IKostarev/yandex-go-dev/internal/utils"
 	"os"
-	"strings"
 )
 
 type Fs struct {
@@ -28,16 +29,22 @@ func NewFs(file *os.File) (*Fs, error) {
 		count: 0,
 	}
 
+	urlData := &URLData{}
+
 	scanner := bufio.NewScanner(file)
 
 	for scanner.Scan() {
 		line := scanner.Text()
-		spl := strings.Split(line, ",")
+		if len(line) == 0 {
+			continue
+		}
 
-		id := spl[0]
-		url := spl[1]
+		err := json.NewDecoder(bytes.NewReader([]byte(line))).Decode(&urlData)
+		if err != nil {
+			logger.Errorf("error json decode in NewFs: %s", err)
+		}
 
-		fs.cache[id] = url
+		fs.cache[urlData.ShortURL] = urlData.OriginalURL
 	}
 
 	if err := scanner.Err(); err != nil {
@@ -76,6 +83,7 @@ func (m *Fs) Save(long string) (string, error) {
 }
 
 func (m *Fs) Get(short string) string {
+	fmt.Println("cache = ", m.cache)
 	return m.cache[short]
 }
 

@@ -1,6 +1,7 @@
 package handlers
 
 import (
+	"errors"
 	"github.com/IKostarev/yandex-go-dev/internal/logger"
 	"github.com/go-chi/chi/v5"
 	"net/http"
@@ -9,14 +10,14 @@ import (
 func (a *App) GetURLHandler(w http.ResponseWriter, r *http.Request) {
 	url := chi.URLParam(r, "id")
 	if url == "" {
-		logger.Errorf("url param bad with id: %s", nil)
+		errors.New("url param bad with id")
 		w.WriteHeader(http.StatusBadRequest)
 		return
 	}
 
 	m := a.Storage.Get(url)
 	if m == "" {
-		logger.Errorf("get url is bad: %s", nil)
+		logger.Errorf("get url is bad: %s", url)
 		w.WriteHeader(http.StatusBadRequest) //TODO в будущем переделать на http.StatusNotFound
 		return
 	}
