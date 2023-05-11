@@ -1,10 +1,10 @@
-package storage
+package utils
 
 import "math/rand"
 
 const letters = 8
 
-func randomString() string {
+func RandomString() string {
 	alphabet := []rune("ABCDEFGHIJKLMNOPQRSTUVWXYZabcdefghijklmnopqrstuvwxyz")
 
 	b := make([]rune, letters)

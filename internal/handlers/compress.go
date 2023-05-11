@@ -1,37 +1,37 @@
 package handlers
 
 import (
-	"github.com/IKostarev/yandex-go-dev/internal/storage"
+	"github.com/IKostarev/yandex-go-dev/internal/logger"
 	"io"
-	"log"
 	"net/http"
 	"net/url"
 )
 
 func (a *App) CompressHandler(w http.ResponseWriter, r *http.Request) {
-	w.Header().Set("Content-Type", "text/plain")
-
 	body, err := io.ReadAll(r.Body)
-	if err != nil {
+	if err != nil || len(body) == 0 {
+		logger.Errorf("body is nil or empty: %s", err)
 		w.WriteHeader(http.StatusBadRequest)
 		return
 	}
 
-	if len(body) == 0 {
-		w.WriteHeader(http.StatusBadRequest)
+	short, err := a.Storage.Save(string(body))
+	if err != nil {
+		logger.Errorf("storage save is error: %s", err)
+		w.WriteHeader(http.StatusBadRequest) //TODO в будущем переделать на http.StatusInternalServerError
 		return
 	}
 
-	miniURL := storage.SaveURL(string(body))
-
-	newURL, err := url.JoinPath(a.Config.BaseShortURL, miniURL)
+	long, err := url.JoinPath(a.Config.BaseShortURL, short)
 	if err != nil {
+		logger.Errorf("join path have err: %s", err)
 		w.WriteHeader(http.StatusBadRequest) //TODO в будущем переделать на http.StatusInternalServerError
 		return
 	}
 
 	w.WriteHeader(http.StatusCreated)
-	if _, err := io.WriteString(w, newURL); err != nil {
-		log.Fatal("Failed to send URL")
+	_, err = w.Write([]byte(long))
+	if err != nil {
+		logger.Errorf("Failed to send URL: %s", err)
 	}
 }
