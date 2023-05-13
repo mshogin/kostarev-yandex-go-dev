@@ -13,5 +13,5 @@ func (a *App) PingHandler(w http.ResponseWriter, _ *http.Request) {
 		return
 	}
 
-	w.WriteHeader(http.StatusCreated)
+	w.WriteHeader(http.StatusOK)
 }
