@@ -27,6 +27,7 @@ func NewApp(cfg config.Config, store storage.Storage) *App {
 	app.Route("/", func(r chi.Router) {
 		r.Post("/", logger.RequestLogger(app.CompressHandler))
 		r.Get("/{id}", logger.ResponseLogger(app.GetURLHandler))
+		r.Get("/ping", logger.ResponseLogger(app.PingHandler))
 
 		r.Route("/api", func(r chi.Router) {
 			r.Post("/shorten", app.JSONHandler)
