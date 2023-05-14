@@ -114,7 +114,8 @@ func (db *DB) checkIsTablesExists() (bool, error) {
 		if err != nil {
 			return false, fmt.Errorf("error scan columns in check tables exists: %w", err)
 		}
-		columns = append(columns, column)
+		newColumns := append(columns, column)
+		columns = newColumns
 	}
 
 	if err = rows.Err(); err != nil {
