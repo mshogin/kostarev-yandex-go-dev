@@ -72,17 +72,14 @@ func (db *DB) Get(shortURL string) string {
 	ctx, cancel := context.WithTimeout(context.Background(), time.Second*5)
 	defer cancel()
 
-	row := db.db.QueryRow(ctx, "SELECT longurl FROM yandex WHERE shorturl = $1", shortURL)
-
 	var longURL string
 
+	row := db.db.QueryRow(ctx, "SELECT longurl FROM yandex WHERE shorturl = $1", shortURL)
 	err := row.Scan(&longURL)
 	if err != nil {
 		logger.Errorf("error is Scan data in SELECT Query: %s", err)
 		return ""
 	}
-
-	db.cache[shortURL] = longURL
 
 	return longURL
 }
