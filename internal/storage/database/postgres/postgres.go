@@ -6,7 +6,6 @@ import (
 	"github.com/jackc/pgx/v5/pgxpool"
 	"time"
 
-	"github.com/IKostarev/yandex-go-dev/internal/logger"
 	"github.com/IKostarev/yandex-go-dev/internal/utils"
 )
 
@@ -65,26 +64,26 @@ func (db *DB) Save(longURL string) (string, error) {
 }
 
 func (db *DB) Get(shortURL string) string {
-	if longURL, ok := db.cache[shortURL]; ok {
-		return longURL
-	}
-
-	ctx, cancel := context.WithTimeout(context.Background(), time.Second*5)
-	defer cancel()
-
-	row := db.db.QueryRow(ctx, "SELECT longurl FROM yandex WHERE shorturl = $1", shortURL)
-
-	var longURL string
-
-	err := row.Scan(&longURL)
-	if err != nil {
-		logger.Errorf("error is Scan data in SELECT Query: %s", err)
-		return ""
-	}
-
-	db.cache[shortURL] = longURL
-
-	return longURL
+	//if longURL, ok := db.cache[shortURL]; ok {
+	//	return longURL
+	//}
+	//
+	//ctx, cancel := context.WithTimeout(context.Background(), time.Second*5)
+	//defer cancel()
+	//
+	//row := db.db.QueryRow(ctx, "SELECT longurl FROM yandex WHERE shorturl = $1", shortURL)
+	//
+	//var longURL string
+	//
+	//err := row.Scan(&longURL)
+	//if err != nil {
+	//	logger.Errorf("error is Scan data in SELECT Query: %s", err)
+	//	return ""
+	//}
+	//
+	//db.cache[shortURL] = longURL
+	//
+	return shortURL // longURL
 }
 
 func (db *DB) Close() error {
@@ -107,26 +106,14 @@ func (db *DB) checkIsTablesExists() (bool, error) {
 	ctx, cancel := context.WithTimeout(context.Background(), time.Second*10)
 	defer cancel()
 
-	rows, err := db.db.Query(ctx, "SELECT column_name FROM information_schema.columns WHERE table_name='yandex' AND column_name IN ('id', 'longurl', 'shorturl')")
+	row := db.db.QueryRow(ctx, "SELECT EXISTS (SELECT FROM yandex)")
+
+	var res bool
+
+	err := row.Scan(&res)
 	if err != nil {
-		return false, fmt.Errorf("error select table in check tables exists: %w", err)
+		return false, err
 	}
 
-	defer rows.Close()
-
-	columns := make([]string, 0)
-	for rows.Next() {
-		var column string
-		err = rows.Scan(&column)
-		if err != nil {
-			return false, fmt.Errorf("error scan columns in check tables exists: %w", err)
-		}
-		columns = append(columns, column)
-	}
-
-	if err = rows.Err(); err != nil {
-		return false, fmt.Errorf("error iterating rows in check tables exists: %w", err)
-	}
-
-	return true, nil
+	return res, nil
 }
