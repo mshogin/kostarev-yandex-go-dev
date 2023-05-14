@@ -3,6 +3,7 @@ package postgres
 import (
 	"context"
 	"fmt"
+	"github.com/IKostarev/yandex-go-dev/internal/logger"
 	"github.com/jackc/pgx/v5/pgxpool"
 	"time"
 
@@ -64,26 +65,26 @@ func (db *DB) Save(longURL string) (string, error) {
 }
 
 func (db *DB) Get(shortURL string) string {
-	//if longURL, ok := db.cache[shortURL]; ok {
-	//	return longURL
-	//}
-	//
-	//ctx, cancel := context.WithTimeout(context.Background(), time.Second*5)
-	//defer cancel()
-	//
-	//row := db.db.QueryRow(ctx, "SELECT longurl FROM yandex WHERE shorturl = $1", shortURL)
-	//
-	//var longURL string
-	//
-	//err := row.Scan(&longURL)
-	//if err != nil {
-	//	logger.Errorf("error is Scan data in SELECT Query: %s", err)
-	//	return ""
-	//}
-	//
-	//db.cache[shortURL] = longURL
-	//
-	return shortURL // longURL
+	if longURL, ok := db.cache[shortURL]; ok {
+		return longURL
+	}
+
+	ctx, cancel := context.WithTimeout(context.Background(), time.Second*5)
+	defer cancel()
+
+	row := db.db.QueryRow(ctx, "SELECT longurl FROM yandex WHERE shorturl = $1", shortURL)
+
+	var longURL string
+
+	err := row.Scan(&longURL)
+	if err != nil {
+		logger.Errorf("error is Scan data in SELECT Query: %s", err)
+		return ""
+	}
+
+	db.cache[shortURL] = longURL
+
+	return longURL
 }
 
 func (db *DB) Close() error {
