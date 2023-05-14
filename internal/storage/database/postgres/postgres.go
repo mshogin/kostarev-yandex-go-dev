@@ -30,16 +30,16 @@ func NewDB(addrConn string) (*DB, error) {
 		count: 1,
 	}
 
-	exists, err := db.checkIsTablesExists()
-	if err != nil {
-		return nil, fmt.Errorf("error check is table exists: %w", err)
-	}
-
-	if !exists {
-		if err = db.createTable(); err != nil {
-			return nil, fmt.Errorf("error create tables: %w", err)
-		}
-	}
+	//exists, err := db.checkIsTablesExists()
+	//if err != nil {
+	//	return nil, fmt.Errorf("error check is table exists: %w", err)
+	//}
+	//
+	//if !exists {
+	//	if err = db.createTable(); err != nil {
+	//		return nil, fmt.Errorf("error create tables: %w", err)
+	//	}
+	//}
 
 	return db, nil
 }
