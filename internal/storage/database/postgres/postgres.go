@@ -18,12 +18,12 @@ type DB struct {
 func NewDB(addrConn string) (*DB, error) {
 	addr, err := pgxpool.ParseConfig(addrConn)
 	if err != nil {
-		logger.Errorf("error parse config: %s", err)
+		return nil, fmt.Errorf("error parse config: %w", err)
 	}
 
 	conn, err := pgxpool.NewWithConfig(context.Background(), addr)
 	if err != nil {
-		logger.Errorf("error create NewWithConfig: %s", err)
+		return nil, fmt.Errorf("error create NewWithConfig: %w", err)
 	}
 
 	db := &DB{
@@ -32,8 +32,15 @@ func NewDB(addrConn string) (*DB, error) {
 		count: 1,
 	}
 
-	if err = db.createTable(); err != nil {
-		logger.Errorf("error create tables: %s", err)
+	exists, err := db.checkIsTablesExists()
+	if err != nil {
+		return nil, fmt.Errorf("error check is table exists: %w", err)
+	}
+
+	if !exists {
+		if err = db.createTable(); err != nil {
+			return nil, fmt.Errorf("error create tables: %w", err)
+		}
 	}
 
 	return db, nil
@@ -91,4 +98,20 @@ func (db *DB) createTable() error {
 	}
 
 	return nil
+}
+
+func (db *DB) checkIsTablesExists() (bool, error) {
+	ctx, cancel := context.WithTimeout(context.Background(), time.Second*10)
+	defer cancel()
+
+	row := db.db.QueryRow(ctx, "SELECT EXISTS (SELECT FROM yandex)")
+
+	var res bool
+
+	err := row.Scan(&res)
+	if err != nil {
+		return false, err
+	}
+
+	return res, nil
 }
