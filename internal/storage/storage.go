@@ -3,6 +3,7 @@ package storage
 import (
 	"fmt"
 	"github.com/IKostarev/yandex-go-dev/internal/config"
+	"github.com/IKostarev/yandex-go-dev/internal/storage/database/postgres"
 	"github.com/IKostarev/yandex-go-dev/internal/storage/fs"
 	"github.com/IKostarev/yandex-go-dev/internal/storage/mem"
 	"os"
@@ -17,6 +18,12 @@ type Storage interface {
 func NewStorage(cfg config.Config) (Storage, error) {
 	var s Storage
 	var err error
+
+	if db := cfg.DatabaseDSN; db != "" {
+		if s, err = postgres.NewDB(cfg.DatabaseDSN); err != nil {
+			return nil, fmt.Errorf("cannot database storage: %w", err)
+		}
+	}
 
 	if path := cfg.FileStoragePath; path != "" {
 		file, err := os.OpenFile(path, os.O_RDWR|os.O_CREATE|os.O_APPEND, 0777)
