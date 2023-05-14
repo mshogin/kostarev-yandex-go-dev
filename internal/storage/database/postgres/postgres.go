@@ -2,14 +2,14 @@ package postgres
 
 import (
 	"context"
+	"database/sql"
 	"fmt"
 	"github.com/IKostarev/yandex-go-dev/internal/utils"
-	"github.com/jackc/pgx/v5/pgxpool"
 	"time"
 )
 
 type DB struct {
-	db    *pgxpool.Pool
+	db    *sql.DB
 	cache map[string]string
 	count int64
 }
@@ -18,14 +18,9 @@ func NewDB(addrConn string) (*DB, error) {
 	ctx, cancel := context.WithCancel(context.Background())
 	defer cancel()
 
-	addr, err := pgxpool.ParseConfig(addrConn)
+	conn, err := sql.Open("pgx", addrConn)
 	if err != nil {
-		return nil, fmt.Errorf("error parse config: %w", err)
-	}
-
-	conn, err := pgxpool.NewWithConfig(context.Background(), addr)
-	if err != nil {
-		return nil, fmt.Errorf("error create NewWithConfig: %w", err)
+		return nil, fmt.Errorf("error open postgres: %w", err)
 	}
 
 	db := &DB{
@@ -54,7 +49,7 @@ func (db *DB) Save(longURL string) (string, error) {
 	ctx, cancel := context.WithTimeout(context.Background(), time.Second*20)
 	defer cancel()
 
-	_, err := db.db.Exec(ctx, `INSERT INTO yandex (id, longurl, shorturl) VALUES ($1, $2, $3);`, db.count, longURL, shortURL)
+	_, err := db.db.ExecContext(ctx, `INSERT INTO yandex (id, longurl, shorturl) VALUES ($1, $2, $3);`, db.count, longURL, shortURL)
 	if err != nil {
 		return "", fmt.Errorf("error is INSERT data in database: %w", err)
 	}
@@ -96,7 +91,7 @@ func (db *DB) Close() error {
 }
 
 func (db *DB) createTable(ctx context.Context) error {
-	_, err := db.db.Exec(ctx, `CREATE TABLE IF NOT EXISTS yandex (id VARCHAR(255) NOT NULL UNIQUE, longurl VARCHAR(255) NOT NULL, shorturl VARCHAR(255) NOT NULL);`)
+	_, err := db.db.ExecContext(ctx, `CREATE TABLE IF NOT EXISTS yandex (id VARCHAR(255) NOT NULL UNIQUE, longurl VARCHAR(255) NOT NULL, shorturl VARCHAR(255) NOT NULL);`)
 	if err != nil {
 		return err
 	}
@@ -105,7 +100,7 @@ func (db *DB) createTable(ctx context.Context) error {
 }
 
 func (db *DB) checkIsTablesExists(ctx context.Context) (bool, error) {
-	row := db.db.QueryRow(ctx, `SELECT COUNT(*) FROM yandex;`)
+	row := db.db.QueryRowContext(ctx, `SELECT COUNT(*) FROM yandex;`)
 
 	var res int
 
