@@ -100,17 +100,26 @@ func (db *DB) checkIsTablesExists() (bool, error) {
 	ctx, cancel := context.WithTimeout(context.Background(), time.Second*10)
 	defer cancel()
 
-	_, err := db.db.Exec(ctx, "CREATE TABLE IF NOT EXISTS yandex (id UUID PRIMARY KEY DEFAULT gen_random_uuid(), longurl VARCHAR(2048) NOT NULL, shorturl VARCHAR(2048) NOT NULL)")
-	if err != nil {
-		return false, fmt.Errorf("error create table in check tables exists: %w", err)
-	}
-
 	rows, err := db.db.Query(ctx, "SELECT column_name FROM information_schema.columns WHERE table_name='yandex' AND column_name IN ('id', 'longurl', 'shorturl')")
 	if err != nil {
 		return false, fmt.Errorf("error select table in check tables exists: %w", err)
 	}
 
 	defer rows.Close()
+
+	columns := make([]string, 0)
+	for rows.Next() {
+		var column string
+		err = rows.Scan(&column)
+		if err != nil {
+			return false, fmt.Errorf("error scan columns in check tables exists: %w", err)
+		}
+		columns = append(columns, column)
+	}
+
+	if err = rows.Err(); err != nil {
+		return false, fmt.Errorf("error iterating rows in check tables exists: %w", err)
+	}
 
 	return true, nil
 }
