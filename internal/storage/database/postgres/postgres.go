@@ -19,12 +19,12 @@ type DB struct {
 func NewDB(addrConn string) (*DB, error) {
 	addr, err := pgxpool.ParseConfig(addrConn)
 	if err != nil {
-		logger.Errorf("error parse config: %s", err)
+		return nil, fmt.Errorf("error parse config: %w", err)
 	}
 
 	conn, err := pgxpool.NewWithConfig(context.Background(), addr)
 	if err != nil {
-		logger.Errorf("error create NewWithConfig: %s", err)
+		return nil, fmt.Errorf("error create NewWithConfig: %w", err)
 	}
 
 	db := &DB{
@@ -71,7 +71,7 @@ func (db *DB) Get(shortURL string) string {
 
 	var longURL string
 
-	ctx, cancel := context.WithTimeout(context.Background(), time.Second*5)
+	ctx, cancel := context.WithTimeout(context.Background(), time.Second*20)
 	defer cancel()
 
 	row, err := db.db.Query(ctx, "SELECT longurl FROM yandex WHERE shorturl = $1", shortURL)
@@ -106,17 +106,21 @@ func (db *DB) createTable() error {
 }
 
 func (db *DB) checkIsTablesExists() (bool, error) {
-	ctx, cancel := context.WithTimeout(context.Background(), time.Second*10)
+	ctx, cancel := context.WithTimeout(context.Background(), time.Second*20)
 	defer cancel()
 
-	row := db.db.QueryRow(ctx, "SELECT EXISTS (SELECT FROM yandex)")
+	row := db.db.QueryRow(ctx, "SELECT EXISTS (SELECT COUNT(*) FROM yandex)")
 
-	var res bool
+	var res int
 
 	err := row.Scan(&res)
 	if err != nil {
-		return false, err
+		return false, fmt.Errorf("error check is table exists: %w", err)
 	}
 
-	return res, nil
+	if res > 0 {
+		return true, nil
+	} else {
+		return false, nil
+	}
 }
