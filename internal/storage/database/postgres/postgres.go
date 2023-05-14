@@ -96,7 +96,7 @@ func (db *DB) Close() error {
 }
 
 func (db *DB) createTable(ctx context.Context) error {
-	_, err := db.db.Exec(ctx, `CREATE TABLE IF NOT EXISTS yandex (id VARCHAR(255) NOT NULL UNIQUE, longurl VARCHAR(255) NOT NULL, shorturl VARCHAR(255) NOT NULL )`)
+	_, err := db.db.Exec(ctx, `CREATE TABLE IF NOT EXISTS yandex (id VARCHAR(255) NOT NULL UNIQUE, longurl VARCHAR(255) NOT NULL, shorturl VARCHAR(255) NOT NULL);`)
 	if err != nil {
 		return err
 	}
@@ -105,7 +105,7 @@ func (db *DB) createTable(ctx context.Context) error {
 }
 
 func (db *DB) checkIsTablesExists(ctx context.Context) (bool, error) {
-	row := db.db.QueryRow(ctx, `SELECT COUNT(*) FROM yandex`)
+	row := db.db.QueryRow(ctx, `SELECT COUNT(*) FROM yandex;`)
 
 	var res int
 
