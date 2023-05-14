@@ -15,6 +15,9 @@ type DB struct {
 }
 
 func NewDB(addrConn string) (*DB, error) {
+	ctx, cancel := context.WithCancel(context.Background())
+	defer cancel()
+
 	addr, err := pgxpool.ParseConfig(addrConn)
 	if err != nil {
 		return nil, fmt.Errorf("error parse config: %w", err)
@@ -31,13 +34,13 @@ func NewDB(addrConn string) (*DB, error) {
 		count: 1,
 	}
 
-	exists, err := db.checkIsTablesExists()
+	exists, err := db.checkIsTablesExists(ctx)
 	if err != nil {
 		return nil, fmt.Errorf("error check is table exists: %w", err)
 	}
 
 	if !exists {
-		if err = db.createTable(); err != nil {
+		if err = db.createTable(ctx); err != nil {
 			return nil, fmt.Errorf("error create tables: %w", err)
 		}
 	}
@@ -92,10 +95,7 @@ func (db *DB) Close() error {
 	return nil //TODO заглушка на будущее, кажется что в бд этот метод вообще не нужен
 }
 
-func (db *DB) createTable() error {
-	ctx, cancel := context.WithTimeout(context.Background(), time.Second*20)
-	defer cancel()
-
+func (db *DB) createTable(ctx context.Context) error {
 	_, err := db.db.Exec(ctx, `CREATE TABLE IF NOT EXISTS yandex (id VARCHAR(255) NOT NULL UNIQUE, longurl VARCHAR(255) NOT NULL, shorturl VARCHAR(255) NOT NULL )`)
 	if err != nil {
 		return err
@@ -104,10 +104,7 @@ func (db *DB) createTable() error {
 	return nil
 }
 
-func (db *DB) checkIsTablesExists() (bool, error) {
-	ctx, cancel := context.WithTimeout(context.Background(), time.Second*20)
-	defer cancel()
-
+func (db *DB) checkIsTablesExists(ctx context.Context) (bool, error) {
 	row := db.db.QueryRow(ctx, `SELECT COUNT(*) FROM yandex`)
 
 	var res int
