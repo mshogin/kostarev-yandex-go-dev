@@ -45,7 +45,7 @@ func (db *DB) Save(longURL string) (string, error) {
 	ctx, cancel := context.WithTimeout(context.Background(), time.Second*5)
 	defer cancel()
 
-	_, err := db.db.Exec(ctx, "INSERT INTO yandex_url (id, long_url, long_url_id) VALUES ($1, $2, $3);", db.count, longURL, shortURL)
+	_, err := db.db.Exec(ctx, "INSERT INTO yandex (id, longurl, shorturl) VALUES ($1, $2, $3);", db.count, longURL, shortURL)
 	if err != nil {
 		return "", fmt.Errorf("error is INSERT data in database: %w", err)
 	}
@@ -62,7 +62,7 @@ func (db *DB) Get(shortURL string) string {
 	ctx, cancel := context.WithTimeout(context.Background(), time.Second*5)
 	defer cancel()
 
-	row, err := db.db.Query(ctx, "SELECT long_url FROM yandex_url WHERE long_url_id = $1", shortURL)
+	row, err := db.db.Query(ctx, "SELECT longurl FROM yandex WHERE shorturl = $1", shortURL)
 	if err != nil {
 		logger.Errorf("error is SELECT data in database: %s", err)
 		return ""
@@ -85,7 +85,7 @@ func (db *DB) createTable() error {
 	ctx, cancel := context.WithTimeout(context.Background(), time.Second*20)
 	defer cancel()
 
-	_, err := db.db.Exec(ctx, "CREATE TABLE yandex_url (id VARCHAR(255) NOT NULL UNIQUE, long_url VARCHAR(255) NOT NULL, long_url_id uuid NOT NULL )")
+	_, err := db.db.Exec(ctx, "CREATE TABLE yandex (id VARCHAR(255) NOT NULL UNIQUE, longurl VARCHAR(255) NOT NULL, shorturl VARCHAR(255) NOT NULL )")
 	if err != nil {
 		return err
 	}
