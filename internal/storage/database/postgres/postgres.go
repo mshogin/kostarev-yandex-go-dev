@@ -3,11 +3,8 @@ package postgres
 import (
 	"context"
 	"fmt"
-	"github.com/IKostarev/yandex-go-dev/internal/logger"
 	"github.com/jackc/pgx/v5/pgxpool"
 	"time"
-
-	"github.com/IKostarev/yandex-go-dev/internal/utils"
 )
 
 type DB struct {
@@ -48,45 +45,47 @@ func NewDB(addrConn string) (*DB, error) {
 }
 
 func (db *DB) Save(longURL string) (string, error) {
-	shortURL := utils.RandomString()
-
-	ctx, cancel := context.WithTimeout(context.Background(), time.Second*5)
-	defer cancel()
-
-	_, err := db.db.Exec(ctx, "INSERT INTO yandex (id, longurl, shorturl) VALUES ($1, $2, $3);", db.count, longURL, shortURL)
-	if err != nil {
-		return "", fmt.Errorf("error is INSERT data in database: %w", err)
-	}
-
-	db.cache[shortURL] = longURL
-	db.count++
-
-	return shortURL, nil
+	//shortURL := utils.RandomString()
+	//
+	//ctx, cancel := context.WithTimeout(context.Background(), time.Second*5)
+	//defer cancel()
+	//
+	//_, err := db.db.Exec(ctx, "INSERT INTO yandex (id, longurl, shorturl) VALUES ($1, $2, $3);", db.count, longURL, shortURL)
+	//if err != nil {
+	//	return "", fmt.Errorf("error is INSERT data in database: %w", err)
+	//}
+	//
+	//db.cache[shortURL] = longURL
+	//db.count++
+	//
+	//return shortURL, nil
+	return longURL, nil
 }
 
 func (db *DB) Get(shortURL string) string {
-	if longURL, ok := db.cache[shortURL]; ok {
-		return longURL
-	}
-
-	var longURL string
-
-	ctx, cancel := context.WithTimeout(context.Background(), time.Second*20)
-	defer cancel()
-
-	row, err := db.db.Query(ctx, "SELECT longurl FROM yandex WHERE shorturl = $1", shortURL)
-	if err != nil {
-		logger.Errorf("error is SELECT data in database: %s", err)
-		return ""
-	}
-
-	err = row.Scan(&longURL)
-	if err != nil {
-		logger.Errorf("error is Scan data in SELECT Query: %s", err)
-		return ""
-	}
-
-	return longURL
+	//if longURL, ok := db.cache[shortURL]; ok {
+	//	return longURL
+	//}
+	//
+	//var longURL string
+	//
+	//ctx, cancel := context.WithTimeout(context.Background(), time.Second*20)
+	//defer cancel()
+	//
+	//row, err := db.db.Query(ctx, "SELECT longurl FROM yandex WHERE shorturl = $1", shortURL)
+	//if err != nil {
+	//	logger.Errorf("error is SELECT data in database: %s", err)
+	//	return ""
+	//}
+	//
+	//err = row.Scan(&longURL)
+	//if err != nil {
+	//	logger.Errorf("error is Scan data in SELECT Query: %s", err)
+	//	return ""
+	//}
+	//
+	//return longURL
+	return shortURL
 }
 
 func (db *DB) Close() error {
