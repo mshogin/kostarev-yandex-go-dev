@@ -3,6 +3,7 @@ package postgres
 import (
 	"context"
 	"fmt"
+	"github.com/IKostarev/yandex-go-dev/internal/utils"
 	"github.com/jackc/pgx/v5/pgxpool"
 	"time"
 )
@@ -45,21 +46,20 @@ func NewDB(addrConn string) (*DB, error) {
 }
 
 func (db *DB) Save(longURL string) (string, error) {
-	//shortURL := utils.RandomString()
-	//
-	//ctx, cancel := context.WithTimeout(context.Background(), time.Second*5)
-	//defer cancel()
-	//
-	//_, err := db.db.Exec(ctx, "INSERT INTO yandex (id, longurl, shorturl) VALUES ($1, $2, $3);", db.count, longURL, shortURL)
-	//if err != nil {
-	//	return "", fmt.Errorf("error is INSERT data in database: %w", err)
-	//}
-	//
-	//db.cache[shortURL] = longURL
-	//db.count++
-	//
-	//return shortURL, nil
-	return longURL, nil
+	shortURL := utils.RandomString()
+
+	ctx, cancel := context.WithTimeout(context.Background(), time.Second*20)
+	defer cancel()
+
+	_, err := db.db.Exec(ctx, `INSERT INTO yandex (id, longurl, shorturl) VALUES ($1, $2, $3);`, db.count, longURL, shortURL)
+	if err != nil {
+		return "", fmt.Errorf("error is INSERT data in database: %w", err)
+	}
+
+	db.cache[shortURL] = longURL
+	db.count++
+
+	return shortURL, nil
 }
 
 func (db *DB) Get(shortURL string) string {
@@ -96,7 +96,7 @@ func (db *DB) createTable() error {
 	ctx, cancel := context.WithTimeout(context.Background(), time.Second*20)
 	defer cancel()
 
-	_, err := db.db.Exec(ctx, "CREATE TABLE yandex (id VARCHAR(255) NOT NULL UNIQUE, longurl VARCHAR(255) NOT NULL, shorturl VARCHAR(255) NOT NULL )")
+	_, err := db.db.Exec(ctx, `CREATE TABLE IF NOT EXISTS yandex (id VARCHAR(255) NOT NULL UNIQUE, longurl VARCHAR(255) NOT NULL, shorturl VARCHAR(255) NOT NULL )`)
 	if err != nil {
 		return err
 	}
@@ -108,7 +108,7 @@ func (db *DB) checkIsTablesExists() (bool, error) {
 	ctx, cancel := context.WithTimeout(context.Background(), time.Second*20)
 	defer cancel()
 
-	row := db.db.QueryRow(ctx, "SELECT COUNT(*) FROM yandex")
+	row := db.db.QueryRow(ctx, `SELECT COUNT(*) FROM yandex`)
 
 	var res int
 
