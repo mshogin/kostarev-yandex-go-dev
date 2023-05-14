@@ -65,17 +65,24 @@ func (db *DB) Save(longURL string) (string, error) {
 }
 
 func (db *DB) Get(shortURL string) string {
-	var longURL string
+	if longURL, ok := db.cache[shortURL]; ok {
+		return longURL
+	}
 
 	ctx, cancel := context.WithTimeout(context.Background(), time.Second*5)
 	defer cancel()
 
 	row := db.db.QueryRow(ctx, "SELECT longurl FROM yandex WHERE shorturl = $1", shortURL)
+
+	var longURL string
+
 	err := row.Scan(&longURL)
 	if err != nil {
 		logger.Errorf("error is Scan data in SELECT Query: %s", err)
 		return ""
 	}
+
+	db.cache[shortURL] = longURL
 
 	return longURL
 }
@@ -114,8 +121,7 @@ func (db *DB) checkIsTablesExists() (bool, error) {
 		if err != nil {
 			return false, fmt.Errorf("error scan columns in check tables exists: %w", err)
 		}
-		newColumns := append(columns, column)
-		columns = newColumns
+		columns = append(columns, column)
 	}
 
 	if err = rows.Err(); err != nil {
