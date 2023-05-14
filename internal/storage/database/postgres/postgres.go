@@ -19,12 +19,12 @@ type DB struct {
 func NewDB(addrConn string) (*DB, error) {
 	addr, err := pgxpool.ParseConfig(addrConn)
 	if err != nil {
-		return nil, fmt.Errorf("error parse config: %w", err)
+		logger.Errorf("error parse config: %s", err)
 	}
 
 	conn, err := pgxpool.NewWithConfig(context.Background(), addr)
 	if err != nil {
-		return nil, fmt.Errorf("error create NewWithConfig: %w", err)
+		logger.Errorf("error create NewWithConfig: %s", err)
 	}
 
 	db := &DB{
@@ -53,7 +53,7 @@ func (db *DB) Save(longURL string) (string, error) {
 	ctx, cancel := context.WithTimeout(context.Background(), time.Second*5)
 	defer cancel()
 
-	_, err := db.db.Exec(ctx, "INSERT INTO yandex (uuid, longurl, shorturl) VALUES ($1, $2, $3);", db.count, longURL, shortURL)
+	_, err := db.db.Exec(ctx, "INSERT INTO yandex (id, longurl, shorturl) VALUES ($1, $2, $3);", db.count, longURL, shortURL)
 	if err != nil {
 		return "", fmt.Errorf("error is INSERT data in database: %w", err)
 	}
@@ -69,13 +69,18 @@ func (db *DB) Get(shortURL string) string {
 		return longURL
 	}
 
+	var longURL string
+
 	ctx, cancel := context.WithTimeout(context.Background(), time.Second*5)
 	defer cancel()
 
-	var longURL string
+	row, err := db.db.Query(ctx, "SELECT longurl FROM yandex WHERE shorturl = $1", shortURL)
+	if err != nil {
+		logger.Errorf("error is SELECT data in database: %s", err)
+		return ""
+	}
 
-	row := db.db.QueryRow(ctx, "SELECT longurl FROM yandex WHERE shorturl = $1", shortURL)
-	err := row.Scan(&longURL)
+	err = row.Scan(&longURL)
 	if err != nil {
 		logger.Errorf("error is Scan data in SELECT Query: %s", err)
 		return ""
@@ -92,9 +97,9 @@ func (db *DB) createTable() error {
 	ctx, cancel := context.WithTimeout(context.Background(), time.Second*20)
 	defer cancel()
 
-	_, err := db.db.Exec(ctx, "CREATE TABLE yandex (uuid UUID NOT NULL UNIQUE, longurl VARCHAR(2048) NOT NULL, shorturl VARCHAR(64) NOT NULL)")
+	_, err := db.db.Exec(ctx, "CREATE TABLE yandex (id VARCHAR(255) NOT NULL UNIQUE, longurl VARCHAR(255) NOT NULL, shorturl VARCHAR(255) NOT NULL )")
 	if err != nil {
-		return fmt.Errorf("error create table in create table: %w", err)
+		return err
 	}
 
 	return nil
