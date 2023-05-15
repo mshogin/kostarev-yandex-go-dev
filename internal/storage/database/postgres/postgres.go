@@ -97,7 +97,7 @@ func (psql *DB) createTable() error {
 
 	_, err := psql.db.Exec(ctx,
 		`CREATE TABLE IF NOT EXISTS yandex (
-    		id VARCHAR(255) NOT NULL UNIQUE,
+    		id SERIAL PRIMARY KEY,
    			longurl VARCHAR(255) NOT NULL,
    			shorturl VARCHAR(255) NOT NULL);`)
 
