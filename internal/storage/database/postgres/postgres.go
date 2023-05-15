@@ -120,3 +120,7 @@ func (psql *DB) checkIsTablesExists() (bool, error) {
 
 	return res, nil
 }
+
+func (psql *DB) Pool() bool {
+	return psql.db.Ping(context.Background()) == nil
+}
