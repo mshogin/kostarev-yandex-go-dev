@@ -7,15 +7,11 @@ import (
 )
 
 func (a *App) PingHandler(w http.ResponseWriter, _ *http.Request) {
-	db, err := postgres.NewPostgresDB(a.Config.FileStoragePath)
-	if err != nil {
-		logger.Errorf("error ping handler: %s", err)
+	if _, err := postgres.NewPostgresDB(a.Config.DatabaseDSN); err != nil {
+		logger.Errorf("error connect to db: %s", err)
 		w.WriteHeader(http.StatusInternalServerError)
+		return
 	}
 
-	if db.Pool() {
-		w.WriteHeader(http.StatusOK)
-	} else {
-		w.WriteHeader(http.StatusInternalServerError)
-	}
+	w.WriteHeader(http.StatusOK)
 }
