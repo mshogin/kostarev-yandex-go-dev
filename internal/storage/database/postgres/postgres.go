@@ -85,9 +85,8 @@ func (psql *DB) Get(shortURL string) string {
 }
 
 func (psql *DB) Close() error {
-	if err := psql.Close(); err != nil {
+	if err := psql.db.Close; err != nil {
 		logger.Errorf("error close db: %s", err)
-		return err
 	}
 
 	return nil //TODO заглушка на будущее, кажется что в бд этот метод вообще не нужен
