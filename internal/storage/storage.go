@@ -20,7 +20,7 @@ func NewStorage(cfg config.Config) (Storage, error) {
 	var err error
 
 	if db := cfg.DatabaseDSN; db != "" {
-		if s, err = postgres.NewDB(cfg.DatabaseDSN); err != nil {
+		if s, err = postgres.NewPostgresDB(cfg.DatabaseDSN); err != nil {
 			return nil, fmt.Errorf("cannot database storage: %w", err)
 		}
 	}

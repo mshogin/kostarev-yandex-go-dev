@@ -2,116 +2,121 @@ package postgres
 
 import (
 	"context"
-	"database/sql"
 	"fmt"
+	"github.com/IKostarev/yandex-go-dev/internal/logger"
 	"github.com/IKostarev/yandex-go-dev/internal/utils"
+	"github.com/jackc/pgx/v5"
+	"github.com/jackc/pgx/v5/pgxpool"
+	uuid "github.com/vgarvardt/pgx-google-uuid/v5"
 	"time"
 )
 
 type DB struct {
-	db    *sql.DB
-	cache map[string]string
-	count int64
+	db *pgxpool.Pool
 }
 
-func NewDB(addrConn string) (*DB, error) {
-	ctx, cancel := context.WithCancel(context.Background())
-	defer cancel()
+var Count uint64
 
-	conn, err := sql.Open("pgx", addrConn)
+func NewPostgresDB(addrConn string) (*DB, error) {
+	conn, err := pgxpool.ParseConfig(addrConn)
 	if err != nil {
-		return nil, fmt.Errorf("error open postgres: %w", err)
+		return nil, fmt.Errorf("error parse config: %w", err)
 	}
 
-	db := &DB{
-		db:    conn,
-		cache: make(map[string]string),
-		count: 1,
+	conn.AfterConnect = func(ctx context.Context, conn *pgx.Conn) error {
+		uuid.Register(conn.TypeMap())
+		return nil
 	}
 
-	exists, err := db.checkIsTablesExists(ctx)
+	db, err := pgxpool.NewWithConfig(context.Background(), conn)
+	if err != nil {
+		return nil, fmt.Errorf("error new config: %w", err)
+	}
+
+	psql := &DB{db: db}
+
+	exists, err := psql.checkIsTablesExists()
 	if err != nil {
 		return nil, fmt.Errorf("error check is table exists: %w", err)
 	}
 
 	if !exists {
-		if err = db.createTable(ctx); err != nil {
-			return nil, fmt.Errorf("error create tables: %w", err)
+		err = psql.createTable()
+		if err != nil {
+			return nil, fmt.Errorf("error create table: %w", err)
 		}
 	}
 
-	return db, nil
+	Count++
+
+	return psql, nil
 }
 
-func (db *DB) Save(longURL string) (string, error) {
+func (psql *DB) Save(longURL string) (string, error) {
 	shortURL := utils.RandomString()
 
-	ctx, cancel := context.WithTimeout(context.Background(), time.Second*20)
+	ctx, cancel := context.WithTimeout(context.Background(), 20*time.Second)
 	defer cancel()
 
-	_, err := db.db.ExecContext(ctx, `INSERT INTO yandex (id, longurl, shorturl) VALUES ($1, $2, $3);`, db.count, longURL, shortURL)
+	_, err := psql.db.Exec(ctx, `INSERT INTO yandex (id, longurl, shorturl) VALUES ($1, $2, $3);`, Count, longURL, shortURL)
 	if err != nil {
 		return "", fmt.Errorf("error is INSERT data in database: %w", err)
 	}
 
-	db.cache[shortURL] = longURL
-	db.count++
-
+	Count++
 	return shortURL, nil
 }
 
-func (db *DB) Get(shortURL string) string {
-	//if longURL, ok := db.cache[shortURL]; ok {
-	//	return longURL
-	//}
-	//
-	//var longURL string
-	//
-	//ctx, cancel := context.WithTimeout(context.Background(), time.Second*20)
-	//defer cancel()
-	//
-	//row, err := db.db.Query(ctx, "SELECT longurl FROM yandex WHERE shorturl = $1", shortURL)
-	//if err != nil {
-	//	logger.Errorf("error is SELECT data in database: %s", err)
-	//	return ""
-	//}
-	//
-	//err = row.Scan(&longURL)
-	//if err != nil {
-	//	logger.Errorf("error is Scan data in SELECT Query: %s", err)
-	//	return ""
-	//}
-	//
-	//return longURL
-	return shortURL
-}
+func (psql *DB) Get(shortURL string) string {
+	var longURL string
 
-func (db *DB) Close() error {
-	return nil //TODO заглушка на будущее, кажется что в бд этот метод вообще не нужен
-}
+	ctx, cancel := context.WithTimeout(context.Background(), 20*time.Second)
+	defer cancel()
 
-func (db *DB) createTable(ctx context.Context) error {
-	_, err := db.db.ExecContext(ctx, `CREATE TABLE IF NOT EXISTS yandex (id VARCHAR(255) NOT NULL UNIQUE, longurl VARCHAR(255) NOT NULL, shorturl VARCHAR(255) NOT NULL);`)
+	row := psql.db.QueryRow(ctx, `SELECT longurl FROM yandex WHERE shorturl = $1`, shortURL)
+
+	err := row.Scan(&longURL)
 	if err != nil {
+		logger.Errorf("error is Scan data in SELECT Query: %s", err)
+		return ""
+	}
+
+	return longURL
+}
+
+func (psql *DB) Close() error {
+	if err := psql.Close(); err != nil {
+		logger.Errorf("error close db: %s", err)
 		return err
 	}
 
-	return nil
+	return nil //TODO заглушка на будущее, кажется что в бд этот метод вообще не нужен
+}
+func (psql *DB) createTable() error {
+	ctx, cancel := context.WithTimeout(context.Background(), 20*time.Second)
+	defer cancel()
+
+	_, err := psql.db.Exec(ctx,
+		`CREATE TABLE IF NOT EXISTS yandex (
+    		id VARCHAR(255) NOT NULL UNIQUE,
+   			longurl VARCHAR(255) NOT NULL,
+   			shorturl VARCHAR(255) NOT NULL);`)
+
+	return err
 }
 
-func (db *DB) checkIsTablesExists(ctx context.Context) (bool, error) {
-	row := db.db.QueryRowContext(ctx, `SELECT COUNT(*) FROM yandex;`)
+func (psql *DB) checkIsTablesExists() (bool, error) {
+	ctx, cancel := context.WithTimeout(context.Background(), 20*time.Second)
+	defer cancel()
 
-	var res int
+	row := psql.db.QueryRow(ctx, `SELECT EXISTS (SELECT FROM pg_tables WHERE schemaname = 'public' AND tablename = 'yandex')`)
+
+	var res bool
 
 	err := row.Scan(&res)
 	if err != nil {
-		return false, fmt.Errorf("error check is table exists: %w", err)
+		return false, fmt.Errorf("error scan: %w", err)
 	}
 
-	if res > 0 {
-		return true, nil
-	} else {
-		return false, nil
-	}
+	return res, nil
 }
