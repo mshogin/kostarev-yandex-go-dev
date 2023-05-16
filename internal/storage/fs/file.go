@@ -22,6 +22,15 @@ type URLData struct {
 	OriginalURL string `json:"original_url"`
 }
 
+func NewFsFromFile(path string) (*Fs, error) {
+	file, err := os.OpenFile(path, os.O_RDWR|os.O_CREATE|os.O_APPEND, 0777)
+	if err != nil {
+		return nil, fmt.Errorf("cannot open file: %w", err)
+	}
+
+	return NewFs(file)
+}
+
 func NewFs(file *os.File) (*Fs, error) {
 	fs := &Fs{
 		fh:    file,
