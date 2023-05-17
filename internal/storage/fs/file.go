@@ -67,11 +67,11 @@ func NewFs(file *os.File) (*Fs, error) {
 	return fs, nil
 }
 
-func (m *Fs) Save(long, corrId string) (string, error) {
+func (m *Fs) Save(long, corrID string) (string, error) {
 	urlData := &URLData{
 		UUID:          fmt.Sprintf("%d", m.count),
 		ShortURL:      utils.RandomString(),
-		CorrelationID: corrId,
+		CorrelationID: corrID,
 		OriginalURL:   long,
 	}
 
@@ -92,7 +92,7 @@ func (m *Fs) Save(long, corrId string) (string, error) {
 
 	m.count++
 
-	if long != "" && corrId == "" {
+	if long != "" && corrID == "" {
 		m.cacheURL[urlData.ShortURL] = urlData.OriginalURL
 		return urlData.ShortURL, nil
 	}
@@ -101,12 +101,12 @@ func (m *Fs) Save(long, corrId string) (string, error) {
 	return urlData.CorrelationID, nil
 }
 
-func (m *Fs) Get(short, corrId string) (string, string) {
-	if short != "" && corrId == "" {
-		return m.cacheURL[short], corrId
+func (m *Fs) Get(short, corrID string) (string, string) {
+	if short != "" && corrID == "" {
+		return m.cacheURL[short], corrID
 	}
 
-	return m.cacheCorrelation[corrId], corrId
+	return m.cacheCorrelation[corrID], corrID
 }
 
 func (m *Fs) Close() error {

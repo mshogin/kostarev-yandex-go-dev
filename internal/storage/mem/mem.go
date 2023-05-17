@@ -18,24 +18,24 @@ func NewMem() (*Mem, error) {
 	return m, nil
 }
 
-func (m *Mem) Save(long, corrId string) (string, error) {
+func (m *Mem) Save(long, corrID string) (string, error) {
 	short := utils.RandomString()
 
-	if long != "" && corrId == "" {
+	if long != "" && corrID == "" {
 		m.cacheMemory[short] = long
 		return short, nil
 	}
 
-	m.cacheCorrelation[corrId] = long
-	return corrId, nil
+	m.cacheCorrelation[corrID] = long
+	return corrID, nil
 }
 
-func (m *Mem) Get(short, corrId string) (string, string) {
-	if short != "" && corrId == "" {
-		return m.cacheMemory[short], corrId
+func (m *Mem) Get(short, corrID string) (string, string) {
+	if short != "" && corrID == "" {
+		return m.cacheMemory[short], corrID
 	}
 
-	return m.cacheCorrelation[corrId], corrId
+	return m.cacheCorrelation[corrID], corrID
 }
 
 func (m *Mem) Close() error {
