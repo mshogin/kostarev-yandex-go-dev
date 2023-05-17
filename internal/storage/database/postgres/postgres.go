@@ -53,17 +53,22 @@ func NewPostgresDB(addrConn string) (*DB, error) {
 }
 
 func (psql *DB) Save(longURL, corrID string) (string, error) {
+	var count string
+
 	shortURL := utils.RandomString()
 
 	ctx, cancel := context.WithTimeout(context.Background(), 20*time.Second)
 	defer cancel()
 
-	_, err := psql.db.Exec(ctx, `INSERT INTO yandex (id, longurl, shorturl, correlation) VALUES ($1, $2, $3, $4);`, Count, longURL, shortURL, corrID)
+	s := psql.db.QueryRow(ctx, `SELECT COUNT(*) FROM yandex`)
+
+	_ = s.Scan(&count)
+
+	_, err := psql.db.Exec(ctx, `INSERT INTO yandex (id, longurl, shorturl, correlation) VALUES ($1, $2, $3, $4);`, count, longURL, shortURL, corrID)
 	if err != nil {
 		return "", fmt.Errorf("error is INSERT data in database: %w", err)
 	}
 
-	Count++
 	return shortURL, nil
 }
 
