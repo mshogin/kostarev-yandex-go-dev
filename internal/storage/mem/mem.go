@@ -5,27 +5,37 @@ import (
 )
 
 type Mem struct {
-	memory map[string]string
+	cacheMemory      map[string]string
+	cacheCorrelation map[string]string
 }
 
 func NewMem() (*Mem, error) {
 	m := &Mem{
-		memory: make(map[string]string),
+		cacheMemory:      make(map[string]string),
+		cacheCorrelation: make(map[string]string),
 	}
 
 	return m, nil
 }
 
-func (m *Mem) Save(long string) (string, error) {
+func (m *Mem) Save(long, corrId string) (string, error) {
 	short := utils.RandomString()
 
-	m.memory[short] = long
+	if long != "" && corrId == "" {
+		m.cacheMemory[short] = long
+		return short, nil
+	}
 
-	return short, nil
+	m.cacheCorrelation[corrId] = long
+	return corrId, nil
 }
 
-func (m *Mem) Get(short string) string {
-	return m.memory[short]
+func (m *Mem) Get(short, corrId string) (string, string) {
+	if short != "" && corrId == "" {
+		return m.cacheMemory[short], corrId
+	}
+
+	return m.cacheCorrelation[corrId], corrId
 }
 
 func (m *Mem) Close() error {

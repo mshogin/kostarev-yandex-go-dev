@@ -25,7 +25,7 @@ func (a *App) JSONHandler(w http.ResponseWriter, r *http.Request) {
 		return
 	}
 
-	short, err := a.Storage.Save(req.ServerURL)
+	short, err := a.Storage.Save(req.ServerURL, "")
 	if err != nil {
 		logger.Errorf("storage save is error: %s", err)
 		w.WriteHeader(http.StatusBadRequest)

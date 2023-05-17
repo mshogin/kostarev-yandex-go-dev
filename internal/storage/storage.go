@@ -9,8 +9,8 @@ import (
 )
 
 type Storage interface {
-	Save(string) (string, error)
-	Get(string) string
+	Save(string, string) (string, error)
+	Get(string, string) (string, string)
 	Close() error
 }
 
