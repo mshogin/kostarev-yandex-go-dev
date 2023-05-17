@@ -99,7 +99,7 @@ func (psql *DB) createTable() error {
 		`CREATE TABLE IF NOT EXISTS yandex (
     		id SERIAL PRIMARY KEY,
    			longurl VARCHAR(255) NOT NULL,
-    		shorturl VARCHAR(255) NOT NULL),
+    		shorturl VARCHAR(255) NOT NULL,
    			correlation VARCHAR(255) NOT NULL);`)
 
 	return err
