@@ -3,7 +3,6 @@ package handlers
 import (
 	"encoding/json"
 	"github.com/IKostarev/yandex-go-dev/internal/logger"
-	"io"
 	"net/http"
 	"net/url"
 )
@@ -19,15 +18,8 @@ type URLsResponse struct {
 }
 
 func (a *App) BatchHandler(w http.ResponseWriter, r *http.Request) {
-	body, err := io.ReadAll(r.Body)
-	if err != nil || len(body) == 0 {
-		logger.Errorf("body is nil or empty: %s", err)
-		w.WriteHeader(http.StatusBadRequest)
-		return
-	}
-
-	var req URLsRequest
-	var resp URLsResponse
+	var req []URLsRequest
+	var resp []URLsResponse
 
 	if err := json.NewDecoder(r.Body).Decode(&req); err != nil {
 		logger.Errorf("json decode is error: %s", err)
@@ -35,21 +27,27 @@ func (a *App) BatchHandler(w http.ResponseWriter, r *http.Request) {
 		return
 	}
 
-	short, err := a.Storage.Save(req.OriginalURL, req.CorrelationID)
-	if err != nil {
-		logger.Errorf("batch save is error: %s", err)
-		w.WriteHeader(http.StatusBadRequest) //TODO в будущем переделать на http.StatusInternalServerError
-		return
-	}
+	for _, item := range req {
 
-	resp.ShortURL, err = url.JoinPath(a.Config.BaseShortURL, short)
-	if err != nil {
-		logger.Errorf("join path have err: %s", err)
-		w.WriteHeader(http.StatusBadRequest) //TODO в будущем переделать на http.StatusInternalServerError
-		return
-	}
+		short, err := a.Storage.Save(item.OriginalURL, item.CorrelationID)
+		if err != nil {
+			logger.Errorf("batch save is error: %s", err)
+			w.WriteHeader(http.StatusBadRequest) // TODO: в будущем переделать на http.StatusInternalServerError
+			return
+		}
 
-	_, resp.CorrelationID = a.Storage.Get(resp.ShortURL, req.CorrelationID)
+		var r URLsResponse
+		r.CorrelationID = item.CorrelationID
+		r.ShortURL, err = url.JoinPath(a.Config.BaseShortURL, short)
+		if err != nil {
+			logger.Errorf("join path has error: %s", err)
+			w.WriteHeader(http.StatusBadRequest) // TODO: в будущем переделать на http.StatusInternalServerError
+			return
+		}
+
+		_, r.CorrelationID = a.Storage.Get(r.ShortURL, item.CorrelationID)
+		resp = append(resp, r)
+	}
 
 	respContent, err := json.Marshal(resp)
 	if err != nil {
@@ -58,7 +56,8 @@ func (a *App) BatchHandler(w http.ResponseWriter, r *http.Request) {
 		return
 	}
 
-	w.WriteHeader(http.StatusOK)
+	w.Header().Set("Content-Type", "application/json")
+	w.WriteHeader(http.StatusCreated)
 	if _, err := w.Write(respContent); err != nil {
 		logger.Errorf("Failed to send URLsResponse on batch handler: %s", err)
 	}
