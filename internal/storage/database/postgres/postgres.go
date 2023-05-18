@@ -66,7 +66,7 @@ func (psql *DB) Save(longURL, corrID string) (string, error) {
 	defer cancel()
 
 	if sh != "" {
-		_, err = psql.db.Exec(ctx, `UPDATE yandex SET shorturl = $1;`, longURL)
+		_, err = psql.db.Exec(ctx, `UPDATE yandex SET shorturl = $1 WHERE longurl = $2;`, shortURL, longURL)
 		if err != nil {
 			return "", fmt.Errorf("error is UPDATE data in database: %w", err)
 		}
