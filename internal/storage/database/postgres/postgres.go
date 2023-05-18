@@ -1,5 +1,7 @@
 package postgres
 
+// go run main.go -d "host=localhost user=postgres password=0823 dbname=yandex sslmode=disable"
+
 import (
 	"context"
 	"fmt"
@@ -53,21 +55,26 @@ func NewPostgresDB(addrConn string) (*DB, error) {
 }
 
 func (psql *DB) Save(longURL, corrID string) (string, error) {
-	sh, err := psql.CheckIsURLExists(longURL)
-	if err != nil {
-		logger.Errorf("error in Check Is URL Exists: %s", err)
-	}
-
-	if sh != "" {
-		return sh, nil
-	}
+	ctx, cancel := context.WithTimeout(context.Background(), 20*time.Second)
+	defer cancel()
 
 	var count string
 
 	shortURL := utils.RandomString()
 
-	ctx, cancel := context.WithTimeout(context.Background(), 20*time.Second)
-	defer cancel()
+	sh, err := psql.CheckIsURLExists(longURL)
+	if err != nil {
+		//logger.Errorf("error in Check Is URL Exists: %s", err)
+	}
+
+	if sh != "" {
+		err := psql.UpdateDB(shortURL, longURL, corrID)
+		if err != nil {
+			//TODO
+		}
+
+		return sh, nil
+	}
 
 	s := psql.db.QueryRow(ctx, `SELECT COUNT(*) FROM yandex`)
 
@@ -149,6 +156,18 @@ func (psql *DB) CheckIsURLExists(longURL string) (string, error) {
 	}
 
 	return res, nil
+}
+
+func (psql *DB) UpdateDB(shortURL, longURL, corrId string) error {
+	ctx, cancel := context.WithTimeout(context.Background(), 20*time.Second)
+	defer cancel()
+
+	_, err := psql.db.Exec(ctx, `UPDATE yandex SET shorturl = $1 WHERE longurl = $2 OR correlation = $3;`, shortURL, longURL, corrId)
+	if err != nil {
+		return fmt.Errorf("error is INSERT data in database: %w", err)
+	}
+
+	return nil
 }
 
 func (psql *DB) Pool() bool {
