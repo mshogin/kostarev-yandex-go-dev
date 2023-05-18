@@ -58,16 +58,21 @@ func (psql *DB) Save(longURL, corrID string) (string, error) {
 		logger.Errorf("error in Check Is URL Exists: %s", err)
 	}
 
-	if sh != "" {
-		return sh, nil
-	}
-
 	var count string
 
 	shortURL := utils.RandomString()
 
 	ctx, cancel := context.WithTimeout(context.Background(), 20*time.Second)
 	defer cancel()
+
+	if sh != "" {
+		_, err = psql.db.Exec(ctx, `UPDATE yandex SET shorturl = $1;`, longURL)
+		if err != nil {
+			return "", fmt.Errorf("error is UPDATE data in database: %w", err)
+		}
+
+		return sh, nil
+	}
 
 	s := psql.db.QueryRow(ctx, `SELECT COUNT(*) FROM yandex`)
 
