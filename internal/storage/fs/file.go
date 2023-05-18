@@ -102,11 +102,7 @@ func (m *Fs) Save(long, corrID string) (string, error) {
 }
 
 func (m *Fs) Get(short, corrID string) (string, string) {
-	if short != "" && corrID == "" {
-		return m.cacheURL[short], corrID
-	}
-
-	return m.cacheCorrelation[corrID], corrID
+	return m.cacheURL[short], corrID
 }
 
 func (m *Fs) Close() error {
