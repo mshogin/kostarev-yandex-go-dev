@@ -62,13 +62,14 @@ func (psql *DB) Save(longURL, corrID string) (string, error) {
 
 	sh, err := psql.CheckIsURLExists(longURL)
 	if err != nil {
+		return "", err
 		//logger.Errorf("error in Check Is URL Exists: %s", err)
 	}
 
 	if sh != "" {
 		err := psql.UpdateDB(sh, longURL, corrID)
 		if err != nil {
-			//TODO
+			return "", err
 		}
 
 		return sh, nil
@@ -156,11 +157,11 @@ func (psql *DB) CheckIsURLExists(longURL string) (string, error) {
 	return res, nil
 }
 
-func (psql *DB) UpdateDB(shortURL, longURL, corrId string) error {
+func (psql *DB) UpdateDB(shortURL, longURL, corrID string) error {
 	ctx, cancel := context.WithTimeout(context.Background(), 20*time.Second)
 	defer cancel()
 
-	_, err := psql.db.Exec(ctx, `UPDATE yandex SET shorturl = $1 WHERE longurl = $2 OR correlation = $3;`, shortURL, longURL, corrId)
+	_, err := psql.db.Exec(ctx, `UPDATE yandex SET shorturl = $1 WHERE longurl = $2 OR correlation = $3;`, shortURL, longURL, corrID)
 	if err != nil {
 		return fmt.Errorf("error is INSERT data in database: %w", err)
 	}
