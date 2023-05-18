@@ -35,10 +35,6 @@ func NewPostgresDB(addrConn string) (*DB, error) {
 
 	psql := &DB{db: db}
 
-	if !psql.DropAllDB() {
-		logger.Errorf("Tables is not dropped: %s", err)
-	}
-
 	exists, err := psql.checkIsTablesExists()
 	if err != nil {
 		return nil, fmt.Errorf("error check is table exists: %w", err)
@@ -57,6 +53,15 @@ func NewPostgresDB(addrConn string) (*DB, error) {
 }
 
 func (psql *DB) Save(longURL, corrID string) (string, error) {
+	sh, err := psql.CheckIsURLExists(longURL)
+	if err != nil {
+		logger.Errorf("error in Check Is URL Exists: %s", err)
+	}
+
+	if sh != "" {
+		return sh, nil
+	}
+
 	var count string
 
 	shortURL := utils.RandomString()
@@ -68,7 +73,7 @@ func (psql *DB) Save(longURL, corrID string) (string, error) {
 
 	_ = s.Scan(&count)
 
-	_, err := psql.db.Exec(ctx, `INSERT INTO yandex (id, longurl, shorturl, correlation) VALUES ($1, $2, $3, $4);`, count, longURL, shortURL, corrID)
+	_, err = psql.db.Exec(ctx, `INSERT INTO yandex (id, longurl, shorturl, correlation) VALUES ($1, $2, $3, $4);`, count, longURL, shortURL, corrID)
 	if err != nil {
 		return "", fmt.Errorf("error is INSERT data in database: %w", err)
 	}
@@ -130,18 +135,22 @@ func (psql *DB) checkIsTablesExists() (bool, error) {
 	return res, nil
 }
 
-func (psql *DB) Pool() bool {
-	return psql.db.Ping(context.Background()) == nil
-}
-
-func (psql *DB) DropAllDB() bool {
+func (psql *DB) CheckIsURLExists(longURL string) (string, error) {
 	ctx, cancel := context.WithTimeout(context.Background(), 20*time.Second)
 	defer cancel()
 
-	_, err := psql.db.Exec(ctx, "DROP TABLE IF EXISTS yandex")
+	row := psql.db.QueryRow(ctx, `SELECT shorturl FROM yandex WHERE longurl = $1`, longURL)
+
+	var res string
+
+	err := row.Scan(&res)
 	if err != nil {
-		return false
+		return "", fmt.Errorf("ошибка при сканировании: %w", err)
 	}
 
-	return true
+	return res, nil
+}
+
+func (psql *DB) Pool() bool {
+	return psql.db.Ping(context.Background()) == nil
 }
