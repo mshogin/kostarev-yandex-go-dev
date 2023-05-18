@@ -1,7 +1,5 @@
 package postgres
 
-// go run main.go -d "host=localhost user=postgres password=0823 dbname=yandex sslmode=disable"
-
 import (
 	"context"
 	"fmt"
@@ -68,7 +66,7 @@ func (psql *DB) Save(longURL, corrID string) (string, error) {
 	}
 
 	if sh != "" {
-		err := psql.UpdateDB(shortURL, longURL, corrID)
+		err := psql.UpdateDB(sh, longURL, corrID)
 		if err != nil {
 			//TODO
 		}
