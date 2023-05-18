@@ -62,14 +62,14 @@ func (psql *DB) Save(longURL, corrID string) (string, error) {
 
 	sh, err := psql.CheckIsURLExists(longURL)
 	if err != nil {
-		return "", err
+		fmt.Println("", err)
 		//logger.Errorf("error in Check Is URL Exists: %s", err)
 	}
 
 	if sh != "" {
 		err := psql.UpdateDB(sh, longURL, corrID)
 		if err != nil {
-			return "", err
+			fmt.Println("", err)
 		}
 
 		return sh, nil
