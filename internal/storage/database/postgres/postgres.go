@@ -35,6 +35,10 @@ func NewPostgresDB(addrConn string) (*DB, error) {
 
 	psql := &DB{db: db}
 
+	if !psql.DropAllDB() {
+		logger.Errorf("Tables is not dropped: %s", err)
+	}
+
 	exists, err := psql.checkIsTablesExists()
 	if err != nil {
 		return nil, fmt.Errorf("error check is table exists: %w", err)
@@ -128,4 +132,16 @@ func (psql *DB) checkIsTablesExists() (bool, error) {
 
 func (psql *DB) Pool() bool {
 	return psql.db.Ping(context.Background()) == nil
+}
+
+func (psql *DB) DropAllDB() bool {
+	ctx, cancel := context.WithTimeout(context.Background(), 20*time.Second)
+	defer cancel()
+
+	_, err := psql.db.Exec(ctx, "DROP TABLE IF EXISTS yandex")
+	if err != nil {
+		return false
+	}
+
+	return true
 }
