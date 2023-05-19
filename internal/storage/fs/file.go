@@ -92,13 +92,9 @@ func (m *Fs) Save(long, corrID string) (string, error) {
 
 	m.count++
 
-	if long != "" && corrID == "" {
-		m.cacheURL[urlData.ShortURL] = urlData.OriginalURL
-		return urlData.ShortURL, nil
-	}
-
+	m.cacheURL[urlData.ShortURL] = urlData.OriginalURL
 	m.cacheCorrelation[urlData.CorrelationID] = urlData.OriginalURL
-	return urlData.CorrelationID, nil
+	return urlData.ShortURL, nil
 }
 
 func (m *Fs) Get(short, corrID string) (string, string) {

@@ -18,11 +18,11 @@ func NewMem() (*Mem, error) {
 	return m, nil
 }
 
-func (m *Mem) Save(long, _ string) (string, error) {
+func (m *Mem) Save(long, corrID string) (string, error) {
 	short := utils.RandomString()
 
 	m.cacheMemory[short] = long
-	m.cacheCorrelation[short] = long
+	m.cacheCorrelation[corrID] = long
 
 	return short, nil
 }
